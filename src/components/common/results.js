@@ -8,14 +8,18 @@ export default function GitMatchResults(props) {
 	} else {
 		results = (
 			<div>
-				<GitMatchResultCard key={null} user={props.GitMatchUser} />
-				{props.results
-					? props.MatchingUsers.map((user, key) => {
-							return <GitMatchResultCard key={key} user={user} />;
-						})
-					: <h3>
-							{props.loading ? 'Loading...' : 'Search A UserName'}
-						</h3>}
+				<GitMatchResultCard
+					key={null}
+					user={props.GitMatchUser}
+					chartData={props.chartData.GitMatchUser}
+					results={props.results}
+				/>
+
+				<GitMatchResultCard
+					user={props.MatchingUsers[0]}
+					chartData={props.chartData.MatchedUser}
+					results={props.results}
+				/>
 			</div>
 		);
 	}

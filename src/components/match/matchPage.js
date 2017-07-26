@@ -2,7 +2,7 @@ import React from 'react';
 import http from 'axios';
 import GitMatchForm from '../common/form';
 import GitMatchResults from '../common/results';
-import { GEOCODING, ACCESS_TOKEN } from '../../.constants';
+import { GEOCODING, ACCESS_TOKEN, COLORS } from '../../.constants';
 
 const headers = {
 	Authorization: `token ${ACCESS_TOKEN}`,
@@ -11,6 +11,10 @@ export class MatchPageComponent extends React.Component {
 	constructor(state, context) {
 		super(state, context);
 		this.state = {
+			chartData: {
+				GitMatchUser: {},
+				MatchedUser: {},
+			},
 			results: false, // Used to Display Results Div on completion
 			loadingText: '', // Text to display what the algorihtm is doing throughout the loading process
 			username: '', // Input data, used to search for user
@@ -74,11 +78,78 @@ export class MatchPageComponent extends React.Component {
 			locationResponse,
 			this.createLanguageToken(this.state.GitMatchUser.topLanguages),
 		);
-		// Update State and Display New Matches
 		this.setState({
 			MatchingUsers: matchUsersResponse,
+		});
+		this.genChart(
+			this.state.GitMatchUser.topLanguages,
+			this.state.MatchingUsers[0].matchingLanguages,
+		);
+		// Update State and Display New Matches
+		this.setState({
 			results: true,
 			loading: false,
+		});
+
+		console.log(this.state.GitMatchUser, this.state.MatchingUsers[0]);
+		console.log(this.state.chartData);
+	};
+	genChart = (gituserdata, gitmatchdata) => {
+		let gituserdatas = [],
+			gitusercolors = [];
+		let gitmatchdatas = [],
+			gitmatchcolors = [];
+		let gitmatchlabels = [];
+		let gituserlabels = [];
+		// Gen GitUser Chart
+		gituserdata.forEach(d => {
+			gituserdatas.push(d.count);
+			gitusercolors.push(COLORS[d.language].color);
+			gituserlabels.push(d.language);
+		});
+
+		// Gen GitMatch Chart
+		gitmatchdata.forEach(d => {
+			gitmatchdatas.push(d.count);
+			gitmatchcolors.push(COLORS[d.language].color);
+			gitmatchlabels.push(d.language);
+		});
+
+		this.setState({
+			chartData: {
+				GitMatchUser: {
+					data: {
+						labels: gituserlabels,
+						datasets: [
+							{
+								label: 'My First dataset',
+								data: gituserdatas,
+								backgroundColor: gitusercolors,
+							},
+						],
+					},
+					options: {
+						responsive: true,
+						maintainAspectRatio: false,
+					},
+				},
+				MatchedUser: {
+					data: {
+						labels: gitmatchlabels,
+						datasets: [
+							{
+								label: 'My First dataset',
+								data: gitmatchdatas,
+								backgroundColor: gitmatchcolors,
+							},
+						],
+					},
+					options: {
+						responsive: true,
+						maintainAspectRatio: false,
+					},
+				},
+			},
 		});
 	};
 	// Async Function that searchs github for users based on location and specific languages
@@ -289,6 +360,7 @@ export class MatchPageComponent extends React.Component {
 					results={this.state.results}
 					loading={this.state.loading}
 					MatchingUsers={this.state.MatchingUsers}
+					chartData={this.state.chartData}
 				/>
 			</div>
 		);
