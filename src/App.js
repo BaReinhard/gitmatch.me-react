@@ -3,12 +3,7 @@ import { MatchPageComponent } from './components/match/matchPage';
 import { LocationPageComponent } from './components/location/locationPage';
 import { AboutPageComponent } from './components/about/aboutPage';
 
-import {
-	BrowserRouter,
-	Route,
-	Link,
-	NavLink,
-} from 'react-router-dom';
+import { BrowserRouter, Route, NavLink } from 'react-router-dom';
 function App() {
 	return (
 		<BrowserRouter>
