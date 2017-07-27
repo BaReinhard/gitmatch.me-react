@@ -3,7 +3,8 @@ import http from 'axios';
 import GitMatchForm from '../common/form';
 import GitMatchResults from '../common/results';
 import { GEOCODING, ACCESS_TOKEN, COLORS } from '../../.constants';
-
+import LoadingModal from '../common/loading';
+import OverlayModal from '../common/overlay';
 const headers = {
 	Authorization: `token ${ACCESS_TOKEN}`,
 };
@@ -15,8 +16,10 @@ export class MatchPageComponent extends React.Component {
 				GitMatchUser: {},
 				MatchedUser: {},
 			},
+			maxIndex: 0,
+			index: 0,
 			results: false, // Used to Display Results Div on completion
-			loadingText: '', // Text to display what the algorihtm is doing throughout the loading process
+			loadingText: 'Loading Best Matches', // Text to display what the algorihtm is doing throughout the loading process
 			username: '', // Input data, used to search for user
 			loading: false, // Used to Display Loading Icons/Dialog/etc
 			GitMatchUser: {
@@ -37,7 +40,10 @@ export class MatchPageComponent extends React.Component {
 	}
 	// Submit Handler, main function that goes through the logic of finding user and matches
 	GitMatch = async event => {
-		this.setState({ loading: true });
+		this.setState({
+			loading: true,
+			loadingText: 'Retrieving your information',
+		});
 		// Prevent Redirection
 		event.preventDefault();
 
@@ -47,54 +53,135 @@ export class MatchPageComponent extends React.Component {
 		);
 		// Set GitMatchUsers (user that is searching) data to state
 		this.setState({
-			GitMatchUser: {
-				loadingText:
-					'Insert Update about What the algorithm is doing, to display to user on loading screen',
-				userData: userResponse.userData,
-				repos: userResponse.repos,
-			},
+			loadingText: 'Validating your location',
 		});
 		// Use Google API to get location
 		let locationResponse = await this.getLocation(
-			this.state.GitMatchUser.userData.location,
+			userResponse.userData.location,
 		);
+		this.setState({
+			loadingText: 'Searching your repos for languages',
+		});
 		// Get Languages to search on
 		let languageResponse = await this.getGitMatchUserLanguages(
-			this.state.GitMatchUser.repos,
+			userResponse.repos,
 		);
-
-		// Set GitMatchUser State
 		this.setState({
-			GitMatchUser: {
-				userData: this.state.GitMatchUser.userData,
-				repos: this.state.GitMatchUser.repos,
-				topLanguages: languageResponse.topLanguages,
-				uniqueLang: languageResponse.uniqueLang,
-			},
+			loadingText: 'Searching for local devs',
 		});
-
 		// Get Matched  Users and Rank them
 		let matchUsersResponse = await this.getMatchedUsers(
 			locationResponse,
-			this.createLanguageToken(this.state.GitMatchUser.topLanguages),
+			this.createLanguageToken(languageResponse.topLanguages),
+			languageResponse.uniqueLang,
 		);
 		this.setState({
-			MatchingUsers: matchUsersResponse,
+			loadingText: 'Generating Language and Repo Charts',
 		});
 		this.genChart(
-			this.state.GitMatchUser.topLanguages,
-			this.state.MatchingUsers[0].matchingLanguages,
+			0,
+			matchUsersResponse[this.state.index].matchingLanguages,
+			languageResponse.topLanguages,
 		);
+		this.setState({
+			loadingText: 'Stargazing your repos',
+		});
+		// Form an Array to simpify getting stars
+		let gitUser = [
+			{
+				userData: userResponse.userData,
+				repos: userResponse.repos,
+
+				topLanguages: languageResponse.topLanguages,
+				uniqueLang: languageResponse.uniqueLang,
+			},
+		];
+		await this.getStars(gitUser);
+		await this.getStars(matchUsersResponse);
+
+		console.log('got stars');
 		// Update State and Display New Matches
 		this.setState({
+			GitMatchUser: gitUser[0],
+			MatchingUsers: matchUsersResponse,
+			maxIndex: matchUsersResponse.length - 2,
 			results: true,
 			loading: false,
 		});
-
-		console.log(this.state.GitMatchUser, this.state.MatchingUsers[0]);
-		console.log(this.state.chartData);
 	};
-	genChart = (gituserdata, gitmatchdata) => {
+	// Used to update One Specific Users Git-Awards Stars
+	getMyStars = async () => {
+		this.setState({
+			loading: true,
+			loadingText: `Updating ${this.state.MatchingUsers[
+				this.state.index
+			].userData.login}'s Star Count`,
+		});
+		let holdingArray = [this.state.MatchingUsers[this.state.index]];
+		let newStateArray = this.state.MatchingUsers;
+
+		await this.getStars(holdingArray);
+		newStateArray[this.state.index] = holdingArray[0];
+		this.setState({
+			MatchingUsers: newStateArray,
+			loading: false,
+		});
+		console.log(this.state.MatchingUsers);
+	};
+	getStars = (matchingUsers = []) => {
+		return new Promise((resolve, reject) => {
+			let promises = [];
+			matchingUsers.forEach((val, index) => {
+				val.stars = false;
+			});
+			matchingUsers.forEach((user, index) => {
+				if (index < 5) {
+					promises.push(
+						http
+							.get(
+								`https://crossorigin.me/http://git-awards.com/api/v0/users/${user
+									.userData.login}`,
+							)
+							.then(
+								response => {
+									let stars = 0;
+									response.data.user.rankings.forEach(rank => {
+										stars += rank.stars_count;
+									});
+									console.log('This is a response', response);
+									user.stars = stars;
+								},
+								error => {
+									user.stars = 'error';
+								},
+							),
+					);
+				}
+			});
+			Promise.all(promises).then(res => {
+				resolve(res);
+			});
+		});
+	};
+	nextMatch = () => {
+		if (this.state.index < this.state.MatchingUsers.length - 2) {
+			this.genChart(
+				this.state.index + 1,
+				this.state.MatchingUsers[this.state.index + 1]
+					.matchingLanguages,
+			);
+		}
+	};
+	previousMatch = () => {
+		if (this.state.index > 0) {
+			this.genChart(
+				this.state.index - 1,
+				this.state.MatchingUsers[this.state.index - 1]
+					.matchingLanguages,
+			);
+		}
+	};
+	genChart = (index = 0, gitmatchdata = [], gituserdata = []) => {
 		let gituserdatas = [],
 			gitusercolors = [];
 		let gitmatchdatas = [],
@@ -114,46 +201,71 @@ export class MatchPageComponent extends React.Component {
 			gitmatchcolors.push(COLORS[d.language].color);
 			gitmatchlabels.push(d.language);
 		});
-
-		this.setState({
-			chartData: {
-				GitMatchUser: {
-					data: {
-						labels: gituserlabels,
-						datasets: [
-							{
-								label: 'My First dataset',
-								data: gituserdatas,
-								backgroundColor: gitusercolors,
-							},
-						],
-					},
-					options: {
-						responsive: true,
-						maintainAspectRatio: false,
-					},
-				},
-				MatchedUser: {
-					data: {
-						labels: gitmatchlabels,
-						datasets: [
-							{
-								label: 'My First dataset',
-								data: gitmatchdatas,
-								backgroundColor: gitmatchcolors,
-							},
-						],
-					},
-					options: {
-						responsive: true,
-						maintainAspectRatio: false,
+		if (gituserdata.length === 0) {
+			this.setState({
+				chartData: {
+					GitMatchUser: this.state.chartData.GitMatchUser,
+					MatchedUser: {
+						data: {
+							labels: gitmatchlabels,
+							datasets: [
+								{
+									label: 'My First dataset',
+									data: gitmatchdatas,
+									backgroundColor: gitmatchcolors,
+								},
+							],
+						},
+						options: {
+							responsive: true,
+							maintainAspectRatio: false,
+						},
 					},
 				},
-			},
-		});
+				index: index,
+			});
+		} else {
+			this.setState({
+				chartData: {
+					GitMatchUser: {
+						data: {
+							labels: gituserlabels,
+							datasets: [
+								{
+									label: 'My First dataset',
+									data: gituserdatas,
+									backgroundColor: gitusercolors,
+								},
+							],
+						},
+						options: {
+							responsive: true,
+							maintainAspectRatio: false,
+						},
+					},
+					MatchedUser: {
+						data: {
+							labels: gitmatchlabels,
+							datasets: [
+								{
+									label: 'My First dataset',
+									data: gitmatchdatas,
+									backgroundColor: gitmatchcolors,
+								},
+							],
+						},
+						options: {
+							responsive: true,
+							maintainAspectRatio: false,
+						},
+					},
+				},
+			});
+		}
 	};
 	// Async Function that searchs github for users based on location and specific languages
-	getMatchedUsers = async (location, languageToken) => {
+	getMatchedUsers = async (location, languageToken, uniqueLang) => {
+		console.log('Data dump', location, languageToken, uniqueLang);
 		let promises = [];
 		let usersData = [];
 		let usersResponse = await http.get(
@@ -173,27 +285,23 @@ export class MatchPageComponent extends React.Component {
 		// Wait for All HTTP requests to finish before parsing the usersData array to create matching Languages and scores for each User
 		await Promise.all(promises);
 		// Parse array to create a Score for each user
+		this.setState({
+			loadingText: 'Calculating Match Score',
+		});
 		usersData.forEach(data => {
 			let repoScore = 0;
 			data.matchingLanguages = {};
 			data.repos.forEach(repo => {
-				if (
-					this.state.GitMatchUser.uniqueLang[repo.language] !==
-					undefined
-				) {
+				if (uniqueLang[repo.language] !== undefined) {
 					// Check to see if this language has been used to calc repo score
 					// This algorihthm takes into account Unique Languages and matching top languages
 					if (data.matchingLanguages[repo.language] === undefined) {
 						// if it hasn't give a weighted score for a newly matched language (weighted heavier than each additional repo lang)
-						repoScore =
-							repoScore +
-							this.state.GitMatchUser.uniqueLang[repo.language] * 100;
+						repoScore = repoScore + uniqueLang[repo.language] * 100;
 						data.matchingLanguages[repo.language] = 1;
 						// if it has, give a slightly less weighted score
 					} else {
-						repoScore =
-							repoScore +
-							1 * this.state.GitMatchUser.uniqueLang[repo.language];
+						repoScore = repoScore + 1 * uniqueLang[repo.language];
 						data.matchingLanguages[repo.language] =
 							data.matchingLanguages[repo.language] + 1;
 					}
@@ -350,18 +458,30 @@ export class MatchPageComponent extends React.Component {
 		return (
 			<div>
 				<GitMatchForm
+					style={{ height: '100vh' }}
 					GitMatch={this.GitMatch}
 					select={this.select}
 					input={this.input}
 					username={this.state.username}
 				/>
+
 				<GitMatchResults
+					nextMatch={this.nextMatch}
+					previousMatch={this.previousMatch}
+					maxIndex={this.state.maxIndex}
+					index={this.state.index}
 					GitMatchUser={this.state.GitMatchUser}
 					results={this.state.results}
 					loading={this.state.loading}
 					MatchingUsers={this.state.MatchingUsers}
 					chartData={this.state.chartData}
+					getMyStars={this.getMyStars}
 				/>
+				<LoadingModal
+					loading={this.state.loading}
+					text={this.state.loadingText}
+				/>
+				<OverlayModal loading={this.state.loading} />
 			</div>
 		);
 	}
