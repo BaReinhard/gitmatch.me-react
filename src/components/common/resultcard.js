@@ -18,6 +18,7 @@ export default function GitMatchResultCard(props) {
 				<GitMatchChart
 					chartData={props.chartData.data}
 					chartOptions={props.chartData.options}
+					chartClick={props.chartClick}
 				/>
 				<hr />
 			</div>
@@ -86,8 +87,10 @@ export default function GitMatchResultCard(props) {
 					{props.user.score}
 				</p>
 				<GitMatchChart
+					getRefs={props.getRefs}
 					chartData={props.chartData.data}
 					chartOptions={props.chartData.options}
+					chartClick={props.chartClick}
 				/>
 
 				<hr />

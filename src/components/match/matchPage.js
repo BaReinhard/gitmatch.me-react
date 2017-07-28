@@ -16,6 +16,7 @@ export class MatchPageComponent extends React.Component {
 				GitMatchUser: {},
 				MatchedUser: {},
 			},
+			elements: [],
 			maxIndex: 0,
 			index: 0,
 			results: false, // Used to Display Results Div on completion
@@ -109,6 +110,50 @@ export class MatchPageComponent extends React.Component {
 			loading: false,
 		});
 	};
+	chartClick = ele => {
+		ele.onClick = e => {
+			console.log(e);
+		};
+		if (this.state.elements.length === 1) {
+			ele.chart_instance.canvas.onclick = (e, index) => {
+				let repos = '';
+				let language = '';
+				var activePoints = ele.chart_instance.getElementsAtEvent(e);
+				var firstPoint = activePoints[0];
+				console.log('showing matched users repo');
+				language = this.state.MatchingUsers[this.state.index]
+					.matchingLanguages[firstPoint._index].language;
+				this.state.MatchingUsers[this.state.index].matchingLanguages[
+					firstPoint._index
+				].reposDetails.forEach(repo => {
+					repos += repo.name + '\n';
+				});
+
+				alert(`Users repos for ${language} are :\n ${repos}`);
+			};
+		} else {
+			ele.chart_instance.canvas.onclick = (e, index) => {
+				let repos = '';
+				let language = '';
+				var activePoints = ele.chart_instance.getElementsAtEvent(e);
+				var firstPoint = activePoints[0];
+				console.log('showing matched users repo');
+				language = this.state.GitMatchUser.topLanguages[
+					firstPoint._index
+				].reposDetails.forEach(repo => {
+					repos += repo.name + '\n';
+				});
+
+				alert(`Users repos for ${language} are :\n ${repos}`);
+			};
+		}
+		let newElements = this.state.elements;
+		newElements.push(ele.chart_instance.canvas);
+		this.setState({
+			elements: newElements,
+		});
+		console.log(this.state.elements);
+	};
 	// Used to update One Specific Users Git-Awards Stars
 	getMyStars = async () => {
 		this.setState({
@@ -171,6 +216,7 @@ export class MatchPageComponent extends React.Component {
 					.matchingLanguages,
 			);
 		}
+		console.log(this.state);
 	};
 	previousMatch = () => {
 		if (this.state.index > 0) {
@@ -217,8 +263,11 @@ export class MatchPageComponent extends React.Component {
 							],
 						},
 						options: {
+							onClick: function(e) {
+								console.log(e);
+							},
 							responsive: true,
-							maintainAspectRatio: false,
+							maintainAspectRatio: true,
 						},
 					},
 				},
@@ -290,12 +339,17 @@ export class MatchPageComponent extends React.Component {
 		});
 		usersData.forEach(data => {
 			let repoScore = 0;
+			let reposHolder = {};
 			data.matchingLanguages = {};
 			data.repos.forEach(repo => {
-				if (uniqueLang[repo.language] !== undefined) {
+				if (
+					uniqueLang[repo.language] !== undefined &&
+					repo.language !== null
+				) {
 					// Check to see if this language has been used to calc repo score
 					// This algorihthm takes into account Unique Languages and matching top languages
 					if (data.matchingLanguages[repo.language] === undefined) {
+						reposHolder[repo.language] = [];
 						// if it hasn't give a weighted score for a newly matched language (weighted heavier than each additional repo lang)
 						repoScore = repoScore + uniqueLang[repo.language] * 100;
 						data.matchingLanguages[repo.language] = 1;
@@ -305,8 +359,11 @@ export class MatchPageComponent extends React.Component {
 						data.matchingLanguages[repo.language] =
 							data.matchingLanguages[repo.language] + 1;
 					}
+
+					reposHolder[repo.language].push(repo);
 				}
 			});
+
 			// Level the score with a natural log and multiply by the gitmatch factor and floor it to a nice integer
 			data.score = Math.floor(Math.log(repoScore) * 10.1231234113);
 			let matchingLanguagesHolder = [];
@@ -316,6 +373,7 @@ export class MatchPageComponent extends React.Component {
 				matchingLanguagesHolder.push({
 					language: key,
 					count: data.matchingLanguages[key],
+					reposDetails: reposHolder[key],
 				});
 			}
 			// Create a matchingLanguages property on matchedUsers object and give the value of the array of matchingLanguages
@@ -362,15 +420,23 @@ export class MatchPageComponent extends React.Component {
 		return new Promise((resolve, reject) => {
 			let topLanguages = [];
 			let uniqueLang = {};
+			let reposHolder = {};
 			// Loop through repos to create a uniqelanguage object to parse into an array
 			repos.forEach(repo => {
-				if (
-					uniqueLang[repo.language] === undefined &&
-					repo.language !== null
-				) {
-					uniqueLang[repo.language] = 1;
-				} else if (repo.language !== null) {
-					uniqueLang[repo.language]++;
+				if (repo.language !== undefined) {
+					if (
+						uniqueLang[repo.language] === undefined &&
+						repo.language !== null
+					) {
+						reposHolder[repo.language] = [];
+
+						uniqueLang[repo.language] = 1;
+					} else if (repo.language !== null) {
+						uniqueLang[repo.language]++;
+					}
+					if (repo.language !== null) {
+						reposHolder[repo.language].push(repo);
+					}
 				}
 			});
 			// Loop through Object to create Top Language Array
@@ -380,6 +446,7 @@ export class MatchPageComponent extends React.Component {
 				topLanguages.push({
 					language: key,
 					count: uniqueLang[key],
+					reposDetails: reposHolder[key],
 				});
 			}
 			//Sort Langauges array descending from most to least
@@ -476,6 +543,7 @@ export class MatchPageComponent extends React.Component {
 					MatchingUsers={this.state.MatchingUsers}
 					chartData={this.state.chartData}
 					getMyStars={this.getMyStars}
+					chartClick={this.chartClick}
 				/>
 				<LoadingModal
 					loading={this.state.loading}
