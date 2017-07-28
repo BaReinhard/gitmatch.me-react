@@ -59,7 +59,7 @@ export default function GitMatchResultCard(props) {
 								Update My Stars
 							</button>
 						: props.user.stars === 'error'
-							? <div>
+							? <span>
 									{' '}<button
 										className="btn btn-info"
 										onClick={props.getMyStars}
@@ -68,7 +68,8 @@ export default function GitMatchResultCard(props) {
 									</button>
 									<span>
 										There was an error retrieving{' '}
-										{props.user.userData}'s stars, Unfortunately,{' '}
+										{props.user.userData.login}'s stars,
+										Unfortunately,{' '}
 										<a
 											href={`http://git-awards.com/users/search?login=${props
 												.user.userData.login}`}
@@ -77,7 +78,7 @@ export default function GitMatchResultCard(props) {
 										</a>{' '}
 										doesn't have their data on file
 									</span>
-								</div>
+								</span>
 							: props.user.stars}
 				</p>
 				<h3>Score</h3>
