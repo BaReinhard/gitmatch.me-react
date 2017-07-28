@@ -4,3 +4,8 @@ This is a work in progress and being built as a team by [Robert Sandor](https://
 
 
 A working Prototype can be seen at http://bareinhard.net/gitmatch-react
+
+
+
+#Latest Feature!
+Click on the users chart to view list of repos!
