@@ -21,7 +21,7 @@ export class MatchPageComponent extends React.Component {
 			GitUserRepo: {
 				topLanguages: undefined,
 			},
-			displayIndex: null,
+			displayIndex: 0,
 			displayMatchUserRepo: false,
 			MatchUserRepo: {
 				matchingLanguages: undefined,
@@ -78,6 +78,18 @@ export class MatchPageComponent extends React.Component {
 		let languageResponse = await this.getGitMatchUserLanguages(
 			userResponse.repos,
 		);
+		// Sort Languages by Stars
+		languageResponse.topLanguages.forEach(topLang => {
+			topLang.reposDetails.sort((a, b) => {
+				if (a.stargazers_count < b.stargazers_count) {
+					return 1;
+				} else if (a.stargazers_count > b.stargazers_count) {
+					return -1;
+				} else {
+					return 0;
+				}
+			});
+		});
 		this.setState({
 			loadingText: 'Searching for local devs',
 		});
@@ -127,6 +139,20 @@ export class MatchPageComponent extends React.Component {
 			MatchUserRepo: {
 				matchingLanguages: undefined,
 			},
+		});
+	};
+	changeIndex = e => {
+		console.log(e.target.innerHTML);
+		let index = 0;
+		this.state.GitMatchUser.topLanguages.forEach((repo, i) => {
+			if (repo.language === e.target.innerHTML) {
+				index = i;
+			}
+		});
+		console.log(index);
+
+		this.setState({
+			displayIndex: index,
 		});
 	};
 	chartClick = ele => {
@@ -580,6 +606,7 @@ export class MatchPageComponent extends React.Component {
 					user={this.state.GitUserRepo || this.state.MatchUserRepo}
 					close={this.closeRepoModal}
 					index={this.state.displayIndex}
+					changeIndex={this.changeIndex}
 				/>
 				<LoadingModal
 					loading={this.state.loading}
