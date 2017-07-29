@@ -5,6 +5,7 @@ import GitMatchResults from '../common/results';
 import { GEOCODING, ACCESS_TOKEN, COLORS } from '../../.constants';
 import LoadingModal from '../common/loading';
 import OverlayModal from '../common/overlay';
+import RepoCard from '../common/repocard';
 const headers = {
 	Authorization: `token ${ACCESS_TOKEN}`,
 };
@@ -16,6 +17,16 @@ export class MatchPageComponent extends React.Component {
 				GitMatchUser: {},
 				MatchedUser: {},
 			},
+			displayGitUserRepo: false,
+			GitUserRepo: {
+				topLanguages: undefined,
+			},
+			displayIndex: null,
+			displayMatchUserRepo: false,
+			MatchUserRepo: {
+				matchingLanguages: undefined,
+			},
+			displayIndex: null,
 			elements: [],
 			maxIndex: 0,
 			index: 0,
@@ -110,6 +121,14 @@ export class MatchPageComponent extends React.Component {
 			loading: false,
 		});
 	};
+	closeRepoModal = () => {
+		this.setState({
+			GitUserRepo: { topLanguages: undefined },
+			MatchUserRepo: {
+				matchingLanguages: undefined,
+			},
+		});
+	};
 	chartClick = ele => {
 		ele.onClick = e => {
 			console.log(e);
@@ -118,33 +137,45 @@ export class MatchPageComponent extends React.Component {
 			ele.chart_instance.canvas.onclick = (e, index) => {
 				let repos = '';
 				let language = '';
-				var activePoints = ele.chart_instance.getElementsAtEvent(e);
-				var firstPoint = activePoints[0];
-				console.log('showing matched users repo');
-				language = this.state.MatchingUsers[this.state.index]
-					.matchingLanguages[firstPoint._index].language;
-				this.state.MatchingUsers[this.state.index].matchingLanguages[
-					firstPoint._index
-				].reposDetails.forEach(repo => {
-					repos += repo.name + '\n';
-				});
-
-				alert(`Users repos for ${language} are :\n ${repos}`);
+				let activePoints = ele.chart_instance.getElementsAtEvent(e);
+				let firstPoint = activePoints[0];
+				if (firstPoint) {
+					console.log('showing matched users repo');
+					language = this.state.MatchingUsers[this.state.index]
+						.matchingLanguages[firstPoint._index].language;
+					this.state.MatchingUsers[
+						this.state.index
+					].matchingLanguages[
+						firstPoint._index
+					].reposDetails.forEach(repo => {
+						repos += repo.name + '\n';
+					});
+					this.setState({
+						displayMatchUserRepo: true,
+						MatchUserRepo: this.state.MatchingUsers[this.state.index],
+						displayIndex: firstPoint._index,
+					});
+				}
 			};
 		} else {
 			ele.chart_instance.canvas.onclick = (e, index) => {
 				let repos = '';
 				let language = '';
-				var activePoints = ele.chart_instance.getElementsAtEvent(e);
-				var firstPoint = activePoints[0];
-				console.log('showing matched users repo');
-				language = this.state.GitMatchUser.topLanguages[
-					firstPoint._index
-				].reposDetails.forEach(repo => {
-					repos += repo.name + '\n';
-				});
-
-				alert(`Users repos for ${language} are :\n ${repos}`);
+				let activePoints = ele.chart_instance.getElementsAtEvent(e);
+				let firstPoint = activePoints[0];
+				if (firstPoint) {
+					console.log('showing matched users repo');
+					language = this.state.GitMatchUser.topLanguages[
+						firstPoint._index
+					].reposDetails.forEach(repo => {
+						repos += repo.name + '\n';
+					});
+					this.setState({
+						displayGitUserRepo: true,
+						GitUserRepo: this.state.GitMatchUser,
+						displayIndex: firstPoint._index,
+					});
+				}
 			};
 		}
 		let newElements = this.state.elements;
@@ -544,6 +575,11 @@ export class MatchPageComponent extends React.Component {
 					chartData={this.state.chartData}
 					getMyStars={this.getMyStars}
 					chartClick={this.chartClick}
+				/>
+				<RepoCard
+					user={this.state.GitUserRepo || this.state.MatchUserRepo}
+					close={this.closeRepoModal}
+					index={this.state.displayIndex}
 				/>
 				<LoadingModal
 					loading={this.state.loading}
