@@ -141,11 +141,13 @@ const RepoCard = props => {
 											</a>
 										</td>
 										<td className="col-sm-2">
-											<i
-												className="fa fa-star"
-												aria-hidden="true"
-											/>{' '}
-											{repo.stargazers_count}
+											<a href={repo.html_url + '/stargazers'}>
+												<i
+													className="fa fa-star"
+													aria-hidden="true"
+												/>
+												{repo.stargazers_count}
+											</a>
 										</td>
 										<td className="col-sm-2">
 											<i
