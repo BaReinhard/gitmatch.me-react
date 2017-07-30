@@ -1,6 +1,6 @@
 import React from 'react';
 import GitMatchResultCard from './resultcard';
-import { Col } from 'react-bootstrap';
+import { Col, Grid } from 'react-bootstrap';
 
 export default function GitMatchResults(props) {
 	let results;
@@ -9,8 +9,8 @@ export default function GitMatchResults(props) {
 		results = <div />;
 	} else {
 		results = (
-			<div className="container" style={{ color: 'black' }}>
-				<Col md={6} xs={12}>
+			<Grid>
+				<Col md={12} style={{ color: 'black' }}>
 					<GitMatchResultCard
 						key={null}
 						user={props.GitMatchUser}
@@ -18,8 +18,7 @@ export default function GitMatchResults(props) {
 						results={props.results}
 						chartClick={props.chartClick}
 					/>
-				</Col>
-				<Col md={6} xs={12}>
+
 					<GitMatchResultCard
 						index={props.index}
 						getMyStars={props.getMyStars}
@@ -32,7 +31,7 @@ export default function GitMatchResults(props) {
 						chartClick={props.chartClick}
 					/>
 				</Col>
-			</div>
+			</Grid>
 		);
 	}
 	return results;

@@ -7,43 +7,61 @@ export default function GitMatchResultCard(props) {
 	if (props.results && !props.nextMatch) {
 		console.log(props);
 		return (
-			<div>
-				<Grid>
-					<Row>
-						<Col xs={4} md={4}>
-							<Thumbnail
-								target="_blank"
-								href={props.user.userData.html_url}
-								src={props.user.userData.avatar_url}
-								responsive
-							/>
-						</Col>
-					</Row>
-				</Grid>
-				<h3>Match</h3>
-				<h4>
-					{props.user.userData.login}
-				</h4>
-				<h3>Stars</h3>
-				<p>
-					{props.user.stars}
-				</p>
+			<Col xs={12} md={6}>
+				<Row>
+					<button
+						style={{ float: 'left', opacity: '0' }}
+						className="btn btn-default"
+					>
+						Previous
+					</button>
+					<button
+						style={{ float: 'right', opacity: '0' }}
+						className="btn btn-default hidden"
+					>
+						Next
+					</button>
+				</Row>
+				<br />
+
+				<div
+					className="information-container"
+					style={{ minHeight: '300px' }}
+				>
+					<Col xs={4} md={4}>
+						<Thumbnail
+							target="_blank"
+							href={props.user.userData.html_url}
+							src={props.user.userData.avatar_url}
+							responsive
+						/>
+					</Col>
+					<h3>Match</h3>
+					<h4>
+						{props.user.userData.login}
+					</h4>
+					<h3>Stars</h3>
+					<p>
+						{props.user.stars}
+					</p>
+				</div>
 				<GitMatchChart
 					chartData={props.chartData.data}
 					chartOptions={props.chartData.options}
 					chartClick={props.chartClick}
 				/>
 				<hr />
-			</div>
+			</Col>
 		);
 		// Returns for Matched Users
 	} else if (props.nextMatch && props.results) {
 		return (
-			<div key={props.key}>
-				<div className="row container">
+			<Col xs={12} md={6} key={props.key}>
+				<Row>
 					{props.index > 0
 						? <button
-								className="btn btndefault"
+								style={{ float: 'left' }}
+								className="btn btn-default"
 								onClick={props.previousMatch}
 							>
 								Previous
@@ -52,65 +70,72 @@ export default function GitMatchResultCard(props) {
 					{props.index < props.maxIndex
 						? <button
 								style={{ float: 'right' }}
-								className="btn btndefault"
+								className="btn btn-default"
 								onClick={props.nextMatch}
 							>
 								Next
 							</button>
 						: <div />}
-				</div>
-				<Grid>
-					<Row>
-						<Col xs={4} md={4}>
-							<Thumbnail
-								target="_blank"
-								href={props.user.userData.html_url}
-								src={props.user.userData.avatar_url}
-								responsive
-							/>
-						</Col>
-					</Row>
-				</Grid>
-				<h3>Top Match</h3>
-				<h4>
-					{props.user.userData.login}
-				</h4>
-				<h3>Stars</h3>
-				<p>
-					{props.user.stars === false
-						? <button
-								className="btn btn-info"
-								onClick={props.getMyStars}
-							>
-								Update My Stars
-							</button>
-						: props.user.stars === 'error'
-							? <span>
-									{' '}<button
-										className="btn btn-info"
-										onClick={props.getMyStars}
-									>
-										Update My Stars
-									</button>
-									<span>
-										There was an error retrieving{' '}
-										{props.user.userData.login}'s stars,
-										Unfortunately,{' '}
-										<a
-											href={`http://git-awards.com/users/search?login=${props
-												.user.userData.login}`}
+				</Row>
+				<br />
+				<div
+					className="information-container"
+					style={{ minHeight: '300px' }}
+				>
+					<Col
+						xs={4}
+						md={4}
+						style={{ textAlign: 'center', margin: '0 auto' }}
+					>
+						<Thumbnail
+							target="_blank"
+							href={props.user.userData.html_url}
+							src={props.user.userData.avatar_url}
+							responsive
+						/>
+					</Col>
+
+					<h3>Top Match</h3>
+					<h4>
+						{props.user.userData.login}
+					</h4>
+					<h3>Stars</h3>
+					<p>
+						{props.user.stars === false
+							? <button
+									className="btn btn-info"
+									onClick={props.getMyStars}
+								>
+									Update My Stars
+								</button>
+							: props.user.stars === 'error'
+								? <span>
+										{' '}<button
+											className="btn btn-info"
+											onClick={props.getMyStars}
 										>
-											Git-Awards
-										</a>{' '}
-										doesn't have their data on file
+											Update My Stars
+										</button>
+										<span>
+											There was an error retrieving{' '}
+											{props.user.userData.login}'s stars,
+											Unfortunately,{' '}
+											<a
+												href={`http://git-awards.com/users/search?login=${props
+													.user.userData.login}`}
+											>
+												Git-Awards
+											</a>{' '}
+											doesn't have their data on file
+										</span>
 									</span>
-								</span>
-							: props.user.stars}
-				</p>
-				<h3>Score</h3>
-				<p>
-					{props.user.score}
-				</p>
+								: props.user.stars}
+					</p>
+					<h3>Score</h3>
+					<p>
+						{props.user.score}
+					</p>
+				</div>
 				<GitMatchChart
 					getRefs={props.getRefs}
 					chartData={props.chartData.data}
@@ -119,7 +144,7 @@ export default function GitMatchResultCard(props) {
 				/>
 
 				<hr />
-			</div>
+			</Col>
 		);
 	} else {
 		return <div />;

@@ -9,6 +9,7 @@ import {
 	ControlLabel,
 	Image,
 	Col,
+	Grid,
 } from 'react-bootstrap';
 
 const overlay = (
@@ -35,17 +36,21 @@ export default function GitMatchForm(props) {
 		height: '100vh',
 	};
 	return (
-		<div style={formStyle}>
+		<Col xs={12} md={6} style={formStyle}>
 			<form
 				className="form-component"
 				onSubmit={props.submit}
-				style={{ top: '20%', position: 'absolute' }}
+				style={{ top: '20%', position: 'absolute', width: '100%' }}
 			>
 				<Col xs={12} md={12}>
-					<Image src={props.image} />
+					<Image
+						src={props.image}
+						responsive
+						style={{ margin: '0' }}
+					/>
 				</Col>
 				<Col xs={12} md={12}>
-					<Image src={props.subImage} />
+					<Image src={props.subImage} responsive />
 				</Col>
 				<FormGroup
 					bsClass="form-group"
@@ -79,6 +84,6 @@ export default function GitMatchForm(props) {
 					</OverlayTrigger>
 				</FormGroup>
 			</form>
-		</div>
+		</Col>
 	);
 }

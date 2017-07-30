@@ -2,7 +2,7 @@ import React from 'react';
 import http from 'axios';
 import GitMatchForm from '../common/form';
 import GitMatchResults from '../common/results';
-import { Modal } from 'react-bootstrap';
+import { Modal, Grid } from 'react-bootstrap';
 import { GEOCODING, ACCESS_TOKEN, COLORS } from '../../.constants';
 import LoadingModal from '../common/loading';
 import OverlayModal from '../common/overlay';
@@ -10,6 +10,9 @@ import RepoCard from '../common/repocard';
 import Logo from '../../img/gitmatch-logo.png';
 import subLogo from '../../img/gitmatchlogo.png';
 import background from '../../img/background.jpg';
+
+import Scroll from 'react-scroll';
+import Element from 'react-scroll/modules/components/Element';
 const headers = {
 	Authorization: `token ${ACCESS_TOKEN}`,
 };
@@ -173,6 +176,11 @@ export class MatchPageComponent extends React.Component {
 				maxIndex: matchUsersResponse.length - 2,
 				results: true,
 				loading: false,
+			});
+			Scroll.scroller.scrollTo('results-scroll', {
+				duration: 1500,
+				delay: 100,
+				smooth: true,
 			});
 		}, 500);
 	};
@@ -636,7 +644,8 @@ export class MatchPageComponent extends React.Component {
 					input={this.state.username}
 					background={background}
 				/>
-
+				<br />
+				<Element name="results-scroll" />
 				<GitMatchResults
 					nextMatch={this.nextMatch}
 					previousMatch={this.previousMatch}

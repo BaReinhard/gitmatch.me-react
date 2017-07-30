@@ -11,7 +11,7 @@ export default class GitMatchChart extends React.Component {
 	}
 	render() {
 		return (
-			<Col md={6} xs={12}>
+			<Col md={12} xs={12}>
 				<Doughnut
 					data={this.props.chartData}
 					options={this.props.chartOptions}
