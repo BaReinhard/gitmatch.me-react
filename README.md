@@ -9,3 +9,4 @@ A working Prototype can be seen at http://bareinhard.net/gitmatch-react
 
 # Latest Feature!
 Click on the users chart to view list of repos!
+Then Click on the Repos in the Repos Modal box!
