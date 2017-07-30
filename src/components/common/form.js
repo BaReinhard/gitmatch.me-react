@@ -7,47 +7,78 @@ import {
 	FormControl,
 	Button,
 	ControlLabel,
+	Image,
+	Col,
 } from 'react-bootstrap';
+
 const overlay = (
 	<Tooltip id="tooltip">
 		<strong>Search By Your Username</strong>
 	</Tooltip>
 );
+
 export default function GitMatchForm(props) {
+	const formStyle = {
+		color: 'black',
+		backgroundImage: 'url(' + props.background + ')',
+		backgroundRepeat: 'no-repeat',
+		backgroundSize: 'cover',
+		backgroundPosition: 'center',
+		display: 'block',
+		width: '100vw',
+		height: '100vh',
+		margin: '0 auto',
+		top: '0',
+		left: 0,
+		right: 0,
+		textAlign: 'center',
+		height: '100vh',
+	};
 	return (
-		<OverlayTrigger placement="bottom" overlay={overlay}>
+		<div style={formStyle}>
 			<form
-				className=""
+				className="form-component"
 				onSubmit={props.submit}
-				style={{
-					width: '75%',
-					margin: '0 auto',
-					textAlign: 'center',
-				}}
+				style={{ top: '20%', position: 'absolute' }}
 			>
-				<FormGroup>
-					<ControlLabel>
+				<Col xs={12} md={12}>
+					<Image src={props.image} />
+				</Col>
+				<Col xs={12} md={12}>
+					<Image src={props.subImage} />
+				</Col>
+				<FormGroup
+					bsClass="form-group"
+					style={{
+						width: '75%',
+						textAlign: 'center',
+						margin: '0 auto',
+					}}
+				>
+					<ControlLabel style={{ color: 'white' }}>
 						{props.title + ' '}
 					</ControlLabel>
-					<InputGroup>
-						<FormControl
-							type="text"
-							name="username"
-							type="text"
-							value={props.input}
-							className="form-control"
-							onChange={props.onInput}
-							onClick={props.select}
-							placeholder="username"
-						/>
-						<InputGroup.Button>
-							<Button type="submit">
-								<span className="fa fa-user-circle" /> MatchMe
-							</Button>
-						</InputGroup.Button>
-					</InputGroup>
+					<OverlayTrigger placement="bottom" overlay={overlay}>
+						<InputGroup>
+							<FormControl
+								type="text"
+								name="username"
+								type="text"
+								value={props.input}
+								className="form-control"
+								onChange={props.onInput}
+								onClick={props.select}
+								placeholder="username"
+							/>
+							<InputGroup.Button>
+								<Button type="submit">
+									<span className="fa fa-user-circle" /> MatchMe
+								</Button>
+							</InputGroup.Button>
+						</InputGroup>
+					</OverlayTrigger>
 				</FormGroup>
 			</form>
-		</OverlayTrigger>
+		</div>
 	);
 }

@@ -9,29 +9,20 @@ import {
 } from 'react-bootstrap';
 import ToggleButtonGroup from 'react-bootstrap/lib/ToggleButtonGroup';
 import ToggleButton from 'react-bootstrap/lib/ToggleButton';
-const styles = {
-	display: 'flex',
-	flexDirection: 'column',
-	alignItems: 'center',
-	boxSizing: 'border-box',
-	backgroundColor: 'rgba(0,0,0,0.8)',
-	color: 'white',
-	width: '100%',
-	position: 'fixed',
-	top: '10%',
-	bottom: '10%',
-	margin: '0 auto',
-	zIndex: '150',
-	display: 'flex',
-	justifyContent: 'space-around',
-};
 
+const repoCardStyle = {
+	color: 'black',
+};
 const RepoCard = props => {
 	let background = 'white';
 	console.log(props.user.topLanguages);
 	if (props.user.topLanguages !== undefined) {
 		return (
-			<Modal show={true} dialogClassName="custom-modal">
+			<Modal
+				show={true}
+				dialogClassName="custom-modal"
+				style={repoCardStyle}
+			>
 				<Tabs
 					activeKey={props.index}
 					onSelect={props.changeIndex}
@@ -104,7 +95,11 @@ const RepoCard = props => {
 	} else if (props.user.matchingLanguages !== undefined) {
 		console.log('matching', props.user.matchingLanguages);
 		return (
-			<Modal show={true} dialogClassName="custom-modal">
+			<Modal
+				show={true}
+				dialogClassName="custom-modal"
+				style={repoCardStyle}
+			>
 				<Tabs
 					activeKey={props.index}
 					onSelect={props.changeIndex}

@@ -8,7 +8,7 @@ export default function GitMatchResults(props) {
 		results = <div />;
 	} else {
 		results = (
-			<div className="container">
+			<div className="container" style={{ color: 'black' }}>
 				<GitMatchResultCard
 					key={null}
 					user={props.GitMatchUser}

@@ -7,6 +7,9 @@ import { GEOCODING, ACCESS_TOKEN, COLORS } from '../../.constants';
 import LoadingModal from '../common/loading';
 import OverlayModal from '../common/overlay';
 import RepoCard from '../common/repocard';
+import Logo from '../../img/gitmatch-logo.png';
+import subLogo from '../../img/gitmatchlogo.png';
+import background from '../../img/background.jpg';
 const headers = {
 	Authorization: `token ${ACCESS_TOKEN}`,
 };
@@ -18,6 +21,7 @@ export class MatchPageComponent extends React.Component {
 				GitMatchUser: {},
 				MatchedUser: {},
 			},
+			percent: 0,
 			displayGitUserRepo: false,
 			GitUserRepo: {
 				topLanguages: undefined,
@@ -56,6 +60,7 @@ export class MatchPageComponent extends React.Component {
 		this.setState({
 			loading: true,
 			loadingText: 'Retrieving your information',
+			percent: 5,
 		});
 		// Prevent Redirection
 		event.preventDefault();
@@ -66,6 +71,7 @@ export class MatchPageComponent extends React.Component {
 		);
 		this.setState({
 			loadingText: 'Validating your location',
+			percent: 10,
 		});
 		// Use Google API to get location
 		let locationResponse = await this.getLocation(
@@ -73,6 +79,7 @@ export class MatchPageComponent extends React.Component {
 		);
 		this.setState({
 			loadingText: 'Searching your repos for languages',
+			percent: 15,
 		});
 		// Get Languages to search on
 		let languageResponse = await this.getGitMatchUserLanguages(
@@ -101,6 +108,7 @@ export class MatchPageComponent extends React.Component {
 		});
 		this.setState({
 			loadingText: 'Searching for local devs',
+			percent: 25,
 		});
 		// Get Matched  Users and Rank them
 		let matchUsersResponse = await this.getMatchedUsers(
@@ -129,6 +137,7 @@ export class MatchPageComponent extends React.Component {
 		});
 		this.setState({
 			loadingText: 'Generating Language and Repo Charts',
+			percent: 35,
 		});
 		this.genChart(
 			0,
@@ -137,6 +146,7 @@ export class MatchPageComponent extends React.Component {
 		);
 		this.setState({
 			loadingText: 'Stargazing your repos',
+			percent: 90,
 		});
 		// Form an Array to simpify getting stars
 		let gitUser = [
@@ -154,12 +164,17 @@ export class MatchPageComponent extends React.Component {
 		console.log('got stars');
 		// Update State and Display New Matches
 		this.setState({
-			GitMatchUser: gitUser[0],
-			MatchingUsers: matchUsersResponse,
-			maxIndex: matchUsersResponse.length - 2,
-			results: true,
-			loading: false,
+			percent: 100,
 		});
+		setTimeout(() => {
+			this.setState({
+				GitMatchUser: gitUser[0],
+				MatchingUsers: matchUsersResponse,
+				maxIndex: matchUsersResponse.length - 2,
+				results: true,
+				loading: false,
+			});
+		}, 500);
 	};
 	closeRepoModal = () => {
 		this.setState({
@@ -359,6 +374,7 @@ export class MatchPageComponent extends React.Component {
 			});
 		} else {
 			this.setState({
+				percent: 85,
 				chartData: {
 					GitMatchUser: {
 						data: {
@@ -420,6 +436,7 @@ export class MatchPageComponent extends React.Component {
 		// Parse array to create a Score for each user
 		this.setState({
 			loadingText: 'Calculating Match Score',
+			percent: 20,
 		});
 		usersData.forEach(data => {
 			let repoScore = 0;
@@ -614,7 +631,10 @@ export class MatchPageComponent extends React.Component {
 					title={'Git Matched with Local Devs instantly'}
 					select={this.select}
 					onInput={this.input}
+					image={Logo}
+					subImage={subLogo}
 					input={this.state.username}
+					background={background}
 				/>
 
 				<GitMatchResults
@@ -639,6 +659,7 @@ export class MatchPageComponent extends React.Component {
 				<LoadingModal
 					loading={this.state.loading}
 					text={this.state.loadingText}
+					percent={this.state.percent}
 				/>
 				<OverlayModal loading={this.state.loading} />
 			</div>

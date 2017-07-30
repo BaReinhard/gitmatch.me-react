@@ -19,7 +19,17 @@ function App() {
 	return (
 		<BrowserRouter>
 			<div>
-				<Navbar inverse collapseOnSelect>
+				<Navbar
+					inverse
+					collapseOnSelect
+					style={{
+						margin: '0',
+						borderRadius: '0',
+						position: 'fixed',
+						width: '100vw',
+						zIndex: '1000',
+					}}
+				>
 					<Navbar.Header>
 						<LinkContainer to="/">
 							<Navbar.Brand>GitMatch.me</Navbar.Brand>

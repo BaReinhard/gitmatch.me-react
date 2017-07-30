@@ -1,5 +1,6 @@
 import React from 'react';
 import GitMatchChart from './chart';
+import { Grid, Row, Col, Thumbnail } from 'react-bootstrap';
 
 export default function GitMatchResultCard(props) {
 	// Returns for User Searching for a match
@@ -7,6 +8,18 @@ export default function GitMatchResultCard(props) {
 		console.log(props);
 		return (
 			<div>
+				<Grid>
+					<Row>
+						<Col xs={4} md={4}>
+							<Thumbnail
+								target="_blank"
+								href={props.user.userData.html_url}
+								src={props.user.userData.avatar_url}
+								responsive
+							/>
+						</Col>
+					</Row>
+				</Grid>
 				<h3>Match</h3>
 				<h4>
 					{props.user.userData.login}
@@ -46,6 +59,18 @@ export default function GitMatchResultCard(props) {
 							</button>
 						: <div />}
 				</div>
+				<Grid>
+					<Row>
+						<Col xs={4} md={4}>
+							<Thumbnail
+								target="_blank"
+								href={props.user.userData.html_url}
+								src={props.user.userData.avatar_url}
+								responsive
+							/>
+						</Col>
+					</Row>
+				</Grid>
 				<h3>Top Match</h3>
 				<h4>
 					{props.user.userData.login}
