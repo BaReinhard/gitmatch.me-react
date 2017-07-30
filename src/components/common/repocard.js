@@ -1,5 +1,14 @@
 import React from 'react';
-
+import {
+	Button,
+	ButtonToolbar,
+	Tabs,
+	Tab,
+	ButtonGroup,
+	Modal,
+} from 'react-bootstrap';
+import ToggleButtonGroup from 'react-bootstrap/lib/ToggleButtonGroup';
+import ToggleButton from 'react-bootstrap/lib/ToggleButton';
 const styles = {
 	display: 'flex',
 	flexDirection: 'column',
@@ -13,48 +22,33 @@ const styles = {
 	bottom: '10%',
 	margin: '0 auto',
 	zIndex: '150',
+	display: 'flex',
+	justifyContent: 'space-around',
 };
+
 const RepoCard = props => {
 	let background = 'white';
+	console.log(props.user.topLanguages);
 	if (props.user.topLanguages !== undefined) {
 		return (
-			<div style={styles}>
-				<div
-					style={{
-						width: '100%',
-						display: 'flex',
-						top: '0',
-						height: '10%',
-					}}
+			<Modal show={true} dialogClassName="custom-modal">
+				<Tabs
+					activeKey={props.index}
+					onSelect={props.changeIndex}
+					id={props.user.userData.login}
 				>
 					{props.user.topLanguages.map((repo, i) => {
-						if (i === props.index) {
-							background = 'gray';
-						} else {
-							background = 'white';
-						}
 						return (
-							<button
-								className="btn btn-default"
-								style={{
-									flex: 1,
-									justifyContent: 'center',
-									alignSelf: 'center',
-									textAlign: 'center',
-									color: 'black',
-									backgroundColor: background,
-									border: '2px black solid',
-									flexDirection: 'row',
-									flexStretch: '1',
-								}}
-								key={i}
+							<Tab
+								title={repo.language}
+								key={i + repo.language + 'language'}
+								eventKey={i}
 								onClick={props.changeIndex}
-							>
-								{repo.language}
-							</button>
+							/>
 						);
 					})}
-				</div>
+				</Tabs>
+
 				<div
 					style={{
 						overflow: 'scroll',
@@ -70,7 +64,13 @@ const RepoCard = props => {
 								return (
 									<tr key={i}>
 										<td className="col-sm-8">
-											{repo.name}
+											<i
+												className="fa fa-github"
+												aria-hidden="true"
+											/>{' '}
+											<a target="_blank" href={repo.html_url}>
+												{repo.name}
+											</a>
 										</td>
 										<td className="col-sm-2">
 											<i
@@ -92,23 +92,87 @@ const RepoCard = props => {
 						</tbody>
 					</table>
 				</div>
-				<button className="btn btn-default" onClick={props.close}>
-					Close
-				</button>
-			</div>
+				<Modal.Footer>
+					<ButtonToolbar>
+						<Button bsStyle="default" onClick={props.close}>
+							Close
+						</Button>
+					</ButtonToolbar>
+				</Modal.Footer>
+			</Modal>
 		);
 	} else if (props.user.matchingLanguages !== undefined) {
+		console.log('matching', props.user.matchingLanguages);
 		return (
-			<div style={styles}>
-				{props.user.matchingLanguages[
-					props.index
-				].reposDetails.map(repo => {
-					return <div>repo.name</div>;
-				})}
-				<button className="btn btn-default" onClick={props.close}>
-					Close
-				</button>
-			</div>
+			<Modal show={true} dialogClassName="custom-modal">
+				<Tabs
+					activeKey={props.index}
+					onSelect={props.changeIndex}
+					id={props.user.userData.login}
+				>
+					{props.user.matchingLanguages.map((repo, i) => {
+						return (
+							<Tab
+								title={repo.language}
+								key={i + repo.language + 'language'}
+								eventKey={i}
+								onClick={props.changeIndex}
+							/>
+						);
+					})}
+				</Tabs>
+
+				<div
+					style={{
+						overflow: 'scroll',
+						width: '100%',
+						height: '80%',
+					}}
+				>
+					<table className="table table-fixed">
+						<tbody>
+							{props.user.matchingLanguages[
+								props.index
+							].reposDetails.map((repo, i) => {
+								return (
+									<tr key={i}>
+										<td className="col-sm-8">
+											<i
+												className="fa fa-github"
+												aria-hidden="true"
+											/>{' '}
+											<a target="_blank" href={repo.html_url}>
+												{' '}{repo.name}
+											</a>
+										</td>
+										<td className="col-sm-2">
+											<i
+												className="fa fa-star"
+												aria-hidden="true"
+											/>{' '}
+											{repo.stargazers_count}
+										</td>
+										<td className="col-sm-2">
+											<i
+												className="fa fa-code-fork"
+												aria-hidden="true"
+											/>{' '}
+											{repo.forks_count}
+										</td>
+									</tr>
+								);
+							})}
+						</tbody>
+					</table>
+				</div>
+				<Modal.Footer>
+					<ButtonToolbar>
+						<Button bsStyle="default" onClick={props.close}>
+							Close
+						</Button>
+					</ButtonToolbar>
+				</Modal.Footer>
+			</Modal>
 		);
 	} else {
 		return <div />;

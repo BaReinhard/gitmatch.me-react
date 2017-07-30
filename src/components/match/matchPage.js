@@ -2,6 +2,7 @@ import React from 'react';
 import http from 'axios';
 import GitMatchForm from '../common/form';
 import GitMatchResults from '../common/results';
+import { Modal } from 'react-bootstrap';
 import { GEOCODING, ACCESS_TOKEN, COLORS } from '../../.constants';
 import LoadingModal from '../common/loading';
 import OverlayModal from '../common/overlay';
@@ -63,7 +64,6 @@ export class MatchPageComponent extends React.Component {
 		let userResponse = await this.getUserRepoData(
 			this.state.username,
 		);
-		// Set GitMatchUsers (user that is searching) data to state
 		this.setState({
 			loadingText: 'Validating your location',
 		});
@@ -79,6 +79,15 @@ export class MatchPageComponent extends React.Component {
 			userResponse.repos,
 		);
 		// Sort Languages by Stars
+		languageResponse.topLanguages.sort((a, b) => {
+			if (a.count < b.count) {
+				return 1;
+			} else if (a.count > b.count) {
+				return -1;
+			} else {
+				return 0;
+			}
+		});
 		languageResponse.topLanguages.forEach(topLang => {
 			topLang.reposDetails.sort((a, b) => {
 				if (a.stargazers_count < b.stargazers_count) {
@@ -99,6 +108,25 @@ export class MatchPageComponent extends React.Component {
 			this.createLanguageToken(languageResponse.topLanguages),
 			languageResponse.uniqueLang,
 		);
+		// Sort Matched Users Repos by Stars
+		matchUsersResponse.forEach(user => {
+			user.matchingLanguages.forEach(langs => {
+				langs.reposDetails.sort((a, b) => {
+					if (a.stargazers_count < b.stargazers_count) {
+						return 1;
+					} else if (a.stargazers_count > b.stargazers_count) {
+						return -1;
+					} else {
+						return 0;
+					}
+				});
+			});
+		});
+
+		// Filter Out GitMatchUser from Matching Users
+		matchUsersResponse = matchUsersResponse.filter(user => {
+			return user.userData.login !== userResponse.userData.login;
+		});
 		this.setState({
 			loadingText: 'Generating Language and Repo Charts',
 		});
@@ -141,16 +169,7 @@ export class MatchPageComponent extends React.Component {
 			},
 		});
 	};
-	changeIndex = e => {
-		console.log(e.target.innerHTML);
-		let index = 0;
-		this.state.GitMatchUser.topLanguages.forEach((repo, i) => {
-			if (repo.language === e.target.innerHTML) {
-				index = i;
-			}
-		});
-		console.log(index);
-
+	changeIndex = index => {
 		this.setState({
 			displayIndex: index,
 		});
@@ -167,6 +186,12 @@ export class MatchPageComponent extends React.Component {
 				let firstPoint = activePoints[0];
 				if (firstPoint) {
 					console.log('showing matched users repo');
+					console.log(
+						'index',
+						this.state.index,
+						'user',
+						this.state.MatchingUsers,
+					);
 					language = this.state.MatchingUsers[this.state.index]
 						.matchingLanguages[firstPoint._index].language;
 					this.state.MatchingUsers[
@@ -177,6 +202,7 @@ export class MatchPageComponent extends React.Component {
 						repos += repo.name + '\n';
 					});
 					this.setState({
+						GitUserRepo: undefined,
 						displayMatchUserRepo: true,
 						MatchUserRepo: this.state.MatchingUsers[this.state.index],
 						displayIndex: firstPoint._index,
@@ -197,6 +223,7 @@ export class MatchPageComponent extends React.Component {
 						repos += repo.name + '\n';
 					});
 					this.setState({
+						MatchUserRepo: undefined,
 						displayGitUserRepo: true,
 						GitUserRepo: this.state.GitMatchUser,
 						displayIndex: firstPoint._index,
@@ -583,10 +610,11 @@ export class MatchPageComponent extends React.Component {
 			<div>
 				<GitMatchForm
 					style={{ height: '100vh' }}
-					GitMatch={this.GitMatch}
+					submit={this.GitMatch}
+					title={'Git Matched with Local Devs instantly'}
 					select={this.select}
-					input={this.input}
-					username={this.state.username}
+					onInput={this.input}
+					input={this.state.username}
 				/>
 
 				<GitMatchResults

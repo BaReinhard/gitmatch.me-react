@@ -5,7 +5,7 @@ export default function GitMatchResults(props) {
 	let results;
 	console.log(props);
 	if (!props.results & !props.loading) {
-		results = <h3>Search with a UserName</h3>;
+		results = <div />;
 	} else {
 		results = (
 			<div className="container">
