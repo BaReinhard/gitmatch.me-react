@@ -1,6 +1,6 @@
 import React from 'react';
 import { Doughnut } from 'react-chartjs-2';
-
+import { Col } from 'react-bootstrap';
 export default class GitMatchChart extends React.Component {
 	constructor() {
 		super();
@@ -11,13 +11,15 @@ export default class GitMatchChart extends React.Component {
 	}
 	render() {
 		return (
-			<Doughnut
-				data={this.props.chartData}
-				options={this.props.chartOptions}
-				ref={'me'}
-				width={600}
-				height={250}
-			/>
+			<Col md={6} xs={12}>
+				<Doughnut
+					data={this.props.chartData}
+					options={this.props.chartOptions}
+					ref={'me'}
+					width={500}
+					height={500}
+				/>
+			</Col>
 		);
 	}
 }
