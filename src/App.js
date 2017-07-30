@@ -6,9 +6,11 @@ import {
 	LinkContainer,
 	IndexLinkContainer,
 } from 'react-router-bootstrap';
+import NavLogo from './img/gitmatch-nav-logo.png';
 import {
 	Navbar,
 	Nav,
+	Image,
 	NavItem,
 	MenuItem,
 	NavDropdown,
@@ -32,7 +34,9 @@ function App() {
 				>
 					<Navbar.Header>
 						<LinkContainer to="/">
-							<Navbar.Brand>GitMatch.me</Navbar.Brand>
+							<Navbar.Brand>
+								<Image src={NavLogo} />
+							</Navbar.Brand>
 						</LinkContainer>
 						<Navbar.Toggle />
 					</Navbar.Header>
