@@ -12,7 +12,6 @@ import subLogo from '../../img/gitmatchlogo.png';
 import background from '../../img/background.jpg';
 
 import Scroll from 'react-scroll';
-import Element from 'react-scroll/modules/components/Element';
 const headers = {
 	Authorization: `token ${ACCESS_TOKEN}`,
 };
@@ -177,7 +176,7 @@ export class MatchPageComponent extends React.Component {
 				results: true,
 				loading: false,
 			});
-			Scroll.scroller.scrollTo('results-scroll', {
+			Scroll.scroller.scrollTo('resultsScroll', {
 				duration: 1500,
 				delay: 100,
 				smooth: true,
@@ -645,7 +644,6 @@ export class MatchPageComponent extends React.Component {
 					background={background}
 				/>
 				<br />
-				<Element name="results-scroll" />
 				<GitMatchResults
 					nextMatch={this.nextMatch}
 					previousMatch={this.previousMatch}

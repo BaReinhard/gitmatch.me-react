@@ -43,14 +43,10 @@ export default function GitMatchForm(props) {
 				style={{ top: '20%', position: 'absolute', width: '100%' }}
 			>
 				<Col xs={12} md={12}>
-					<Image
-						src={props.image}
-						responsive
-						style={{ margin: '0' }}
-					/>
+					<Image src={props.image} style={{ margin: '0' }} />
 				</Col>
 				<Col xs={12} md={12}>
-					<Image src={props.subImage} responsive />
+					<Image src={props.subImage} />
 				</Col>
 				<FormGroup
 					bsClass="form-group"

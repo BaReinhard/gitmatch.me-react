@@ -7,7 +7,7 @@ export default function GitMatchResultCard(props) {
 	if (props.results && !props.nextMatch) {
 		console.log(props);
 		return (
-			<Col xs={12} md={6}>
+			<Col id="resultsScroll" xs={12} md={6}>
 				<Row>
 					<button
 						style={{ float: 'left', opacity: '0' }}
@@ -33,7 +33,6 @@ export default function GitMatchResultCard(props) {
 							target="_blank"
 							href={props.user.userData.html_url}
 							src={props.user.userData.avatar_url}
-							responsive
 						/>
 					</Col>
 					<h3>Match</h3>
@@ -91,7 +90,6 @@ export default function GitMatchResultCard(props) {
 							target="_blank"
 							href={props.user.userData.html_url}
 							src={props.user.userData.avatar_url}
-							responsive
 						/>
 					</Col>
 
