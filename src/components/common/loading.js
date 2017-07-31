@@ -16,7 +16,10 @@ export default function LoadingModal(props) {
 				</h3>
 				<i className="fa fa-cog fa-spin fa-3x fa-fw" />
 				<span className="sr-only">Loading...</span>
-				<ProgressBar now={props.percent} />
+				<ProgressBar
+					style={{ margin: '30px 5%' }}
+					now={props.percent}
+				/>
 			</div>
 		</Modal>
 	);

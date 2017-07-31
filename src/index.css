@@ -4,14 +4,16 @@ body {
 	font-family: sans-serif;
 	color: white;
 }
+
 .search-bar {
 	position: fixed;
-	width: 80%;
-	top: 60px;
+	width: 100%;
+	top: 50px;
 	left: 0;
 	right: 0;
 	z-index: 1000;
-	margin: 0 auto;
+	padding: 10px 60px 10px 60px;
+	background-color: rgb(0, 0, 0);
 }
 @media (min-width: 768px) {
 	.search-bar {
