@@ -35,14 +35,22 @@ export default function GitMatchResultCard(props) {
 							src={props.user.userData.avatar_url}
 						/>
 					</Col>
-					<h3>Match</h3>
-					<h4>
-						{props.user.userData.login}
-					</h4>
-					<h3>Stars</h3>
-					<p>
-						{props.user.stars}
-					</p>
+					<Col xs={12} md={12}>
+						<h3>Match</h3>
+						<h4>
+							{props.user.userData.login}
+						</h4>
+						<h3>Stars</h3>
+						<p>
+							{props.user.stars}
+						</p>
+					</Col>
+					<div>
+						<h3>Location:</h3>
+						<p>
+							{' '}{props.user.userData.location}
+						</p>
+					</div>
 				</div>
 				<GitMatchChart
 					chartData={props.chartData.data}
@@ -92,48 +100,54 @@ export default function GitMatchResultCard(props) {
 							src={props.user.userData.avatar_url}
 						/>
 					</Col>
-
-					<h3>Top Match</h3>
-					<h4>
-						{props.user.userData.login}
-					</h4>
-					<h3>Stars</h3>
-					<p>
-						{props.user.stars === false
-							? <button
-									className="btn btn-info"
-									onClick={props.getMyStars}
-								>
-									Update My Stars
-								</button>
-							: props.user.stars === 'error'
-								? <span>
-										{' '}<button
-											className="btn btn-info"
-											onClick={props.getMyStars}
-										>
-											Update My Stars
-										</button>
-										<span>
-											There was an error retrieving{' '}
-											{props.user.userData.login}'s stars,
-											Unfortunately,{' '}
-											<a
-												href={`http://git-awards.com/users/search?login=${props
-													.user.userData.login}`}
+					<Col xs={12} md={12}>
+						<h3>Top Match</h3>
+						<h4>
+							{props.user.userData.login}
+						</h4>
+						<h3>Stars</h3>
+						<p>
+							{props.user.stars === false
+								? <button
+										className="btn btn-info"
+										onClick={props.getMyStars}
+									>
+										Update My Stars
+									</button>
+								: props.user.stars === 'error'
+									? <span>
+											{' '}<button
+												className="btn btn-info"
+												onClick={props.getMyStars}
 											>
-												Git-Awards
-											</a>{' '}
-											doesn't have their data on file
+												Update My Stars
+											</button>
+											<span>
+												There was an error retrieving{' '}
+												{props.user.userData.login}'s stars,
+												Unfortunately,{' '}
+												<a
+													href={`http://git-awards.com/users/search?login=${props
+														.user.userData.login}`}
+												>
+													Git-Awards
+												</a>{' '}
+												doesn't have their data on file
+											</span>
 										</span>
-									</span>
-								: props.user.stars}
-					</p>
-					<h3>Score</h3>
+									: props.user.stars}
+						</p>
+						<h3>Score</h3>
+						<p>
+							{props.user.score}
+						</p>
+					</Col>
+					<h3>Location: </h3>
 					<p>
-						{props.user.score}
+						{' '}{props.user.userData.location}
 					</p>
 				</div>
+
 				<GitMatchChart
 					getRefs={props.getRefs}
 					chartData={props.chartData.data}
