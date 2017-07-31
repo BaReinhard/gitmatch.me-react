@@ -4,3 +4,21 @@ body {
 	font-family: sans-serif;
 	color: white;
 }
+.search-bar {
+	position: fixed;
+	width: 80%;
+	top: 60px;
+	left: 0;
+	right: 0;
+	z-index: 1000;
+	margin: 0 auto;
+}
+@media (min-width: 768px) {
+	.search-bar {
+		position: fixed;
+		width: 40%;
+		top: 1%;
+		left: 10%;
+		z-index: 1000;
+	}
+}

@@ -1,6 +1,7 @@
 import React from 'react';
 import GitMatchChart from './chart';
 import { Grid, Row, Col, Thumbnail } from 'react-bootstrap';
+import Waypoint from 'react-waypoint';
 
 export default function GitMatchResultCard(props) {
 	// Returns for User Searching for a match
@@ -58,6 +59,10 @@ export default function GitMatchResultCard(props) {
 					chartClick={props.chartClick}
 				/>
 				<hr />
+				<Waypoint
+					onEnter={props.setClass}
+					onLeave={props.unsetClass}
+				/>
 			</Col>
 		);
 		// Returns for Matched Users

@@ -60,7 +60,7 @@ export default function GitMatchForm(props) {
 						{props.title + ' '}
 					</ControlLabel>
 					<OverlayTrigger placement="bottom" overlay={overlay}>
-						<InputGroup>
+						<InputGroup className={props.dynamicClass}>
 							<FormControl
 								type="text"
 								name="username"

@@ -23,6 +23,7 @@ export class MatchPageComponent extends React.Component {
 				GitMatchUser: {},
 				MatchedUser: {},
 			},
+			dynamicClass: '',
 			percent: 0,
 			displayGitUserRepo: false,
 			GitUserRepo: {
@@ -628,7 +629,16 @@ export class MatchPageComponent extends React.Component {
 	select = event => {
 		event.target.select();
 	};
-
+	setClass = () => {
+		this.setState({
+			dynamicClass: 'search-bar',
+		});
+	};
+	unsetClass = () => {
+		this.setState({
+			dynamicClass: '',
+		});
+	};
 	render() {
 		return (
 			<div>
@@ -642,6 +652,7 @@ export class MatchPageComponent extends React.Component {
 					subImage={subLogo}
 					input={this.state.username}
 					background={background}
+					dynamicClass={this.state.dynamicClass}
 				/>
 				<br />
 				<GitMatchResults
@@ -656,6 +667,8 @@ export class MatchPageComponent extends React.Component {
 					chartData={this.state.chartData}
 					getMyStars={this.getMyStars}
 					chartClick={this.chartClick}
+					setClass={this.setClass}
+					unsetClass={this.unsetClass}
 				/>
 				<RepoCard
 					user={this.state.GitUserRepo || this.state.MatchUserRepo}

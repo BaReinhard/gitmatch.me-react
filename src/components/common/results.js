@@ -17,6 +17,8 @@ export default function GitMatchResults(props) {
 						chartData={props.chartData.GitMatchUser}
 						results={props.results}
 						chartClick={props.chartClick}
+						setClass={props.setClass}
+						unsetClass={props.unsetClass}
 					/>
 
 					<GitMatchResultCard
