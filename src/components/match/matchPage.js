@@ -71,25 +71,19 @@ export class MatchPageComponent extends React.Component {
 		event.preventDefault();
 
 		// Get the users userData and repos
-		let userResponse = await this.getUserRepoData(
-			this.state.username,
-		);
+		let userResponse = await this.getUserRepoData(this.state.username);
 		this.setState({
 			loadingText: 'Validating your location',
 			percent: 10,
 		});
 		// Use Google API to get location
-		let locationResponse = await this.getLocation(
-			userResponse.userData.location,
-		);
+		let locationResponse = await this.getLocation(userResponse.userData.location);
 		this.setState({
 			loadingText: 'Searching your repos for languages',
 			percent: 15,
 		});
 		// Get Languages to search on
-		let languageResponse = await this.getGitMatchUserLanguages(
-			userResponse.repos,
-		);
+		let languageResponse = await this.getGitMatchUserLanguages(userResponse.repos);
 		// Sort Languages by Stars
 		languageResponse.topLanguages.sort((a, b) => {
 			if (a.count < b.count) {
@@ -144,11 +138,8 @@ export class MatchPageComponent extends React.Component {
 			loadingText: 'Generating Language and Repo Charts',
 			percent: 35,
 		});
-		this.genChart(
-			0,
-			matchUsersResponse[this.state.index].matchingLanguages,
-			languageResponse.topLanguages,
-		);
+
+		this.genChart(0, matchUsersResponse[0].matchingLanguages, languageResponse.topLanguages);
 		this.setState({
 			loadingText: 'Stargazing your repos',
 			percent: 90,
@@ -185,13 +176,7 @@ export class MatchPageComponent extends React.Component {
 			});
 		});
 	};
-	scrollTo = (
-		element = '',
-		duration = 1500,
-		delay = 100,
-		smooth = 'true',
-		offset = -50,
-	) => {
+	scrollTo = (element = '', duration = 1500, delay = 100, smooth = 'true', offset = -50) => {
 		/*
 
 		Other options for smooth
@@ -260,19 +245,9 @@ easeInOutQuint
 				let firstPoint = activePoints[0];
 				if (firstPoint) {
 					console.log('showing matched users repo');
-					console.log(
-						'index',
-						this.state.index,
-						'user',
-						this.state.MatchingUsers,
-					);
-					language = this.state.MatchingUsers[this.state.index]
-						.matchingLanguages[firstPoint._index].language;
-					this.state.MatchingUsers[
-						this.state.index
-					].matchingLanguages[
-						firstPoint._index
-					].reposDetails.forEach(repo => {
+					console.log('index', this.state.index, 'user', this.state.MatchingUsers);
+					language = this.state.MatchingUsers[this.state.index].matchingLanguages[firstPoint._index].language;
+					this.state.MatchingUsers[this.state.index].matchingLanguages[firstPoint._index].reposDetails.forEach(repo => {
 						repos += repo.name + '\n';
 					});
 					this.setState({
@@ -291,9 +266,7 @@ easeInOutQuint
 				let firstPoint = activePoints[0];
 				if (firstPoint) {
 					console.log('showing matched users repo');
-					language = this.state.GitMatchUser.topLanguages[
-						firstPoint._index
-					].reposDetails.forEach(repo => {
+					language = this.state.GitMatchUser.topLanguages[firstPoint._index].reposDetails.forEach(repo => {
 						repos += repo.name + '\n';
 					});
 					this.setState({
@@ -316,9 +289,7 @@ easeInOutQuint
 	getMyStars = async () => {
 		this.setState({
 			loading: true,
-			loadingText: `Updating ${this.state.MatchingUsers[
-				this.state.index
-			].userData.login}'s Star Count`,
+			loadingText: `Updating ${this.state.MatchingUsers[this.state.index].userData.login}'s Star Count`,
 		});
 		let holdingArray = [this.state.MatchingUsers[this.state.index]];
 		let newStateArray = this.state.MatchingUsers;
@@ -340,24 +311,19 @@ easeInOutQuint
 			matchingUsers.forEach((user, index) => {
 				if (index < 5) {
 					promises.push(
-						http
-							.get(
-								`https://crossorigin.me/http://git-awards.com/api/v0/users/${user
-									.userData.login}`,
-							)
-							.then(
-								response => {
-									let stars = 0;
-									response.data.user.rankings.forEach(rank => {
-										stars += rank.stars_count;
-									});
-									console.log('This is a response', response);
-									user.stars = stars;
-								},
-								error => {
-									user.stars = 'error';
-								},
-							),
+						http.get(`https://crossorigin.me/http://git-awards.com/api/v0/users/${user.userData.login}`).then(
+							response => {
+								let stars = 0;
+								response.data.user.rankings.forEach(rank => {
+									stars += rank.stars_count;
+								});
+								console.log('This is a response', response);
+								user.stars = stars;
+							},
+							error => {
+								user.stars = 'error';
+							},
+						),
 					);
 				}
 			});
@@ -368,108 +334,110 @@ easeInOutQuint
 	};
 	nextMatch = () => {
 		if (this.state.index < this.state.MatchingUsers.length - 2) {
-			this.genChart(
-				this.state.index + 1,
-				this.state.MatchingUsers[this.state.index + 1]
-					.matchingLanguages,
-			);
+			this.genChart(this.state.index + 1, this.state.MatchingUsers[this.state.index + 1].matchingLanguages);
 		}
 		console.log(this.state);
 	};
 	previousMatch = () => {
 		if (this.state.index > 0) {
-			this.genChart(
-				this.state.index - 1,
-				this.state.MatchingUsers[this.state.index - 1]
-					.matchingLanguages,
-			);
+			this.genChart(this.state.index - 1, this.state.MatchingUsers[this.state.index - 1].matchingLanguages);
 		}
 	};
-	genChart = (index = 0, gitmatchdata = [], gituserdata = []) => {
-		let gituserdatas = [],
-			gitusercolors = [];
-		let gitmatchdatas = [],
-			gitmatchcolors = [];
-		let gitmatchlabels = [];
-		let gituserlabels = [];
-		// Gen GitUser Chart
-		gituserdata.forEach(d => {
-			gituserdatas.push(d.count);
-			gitusercolors.push(COLORS[d.language].color);
-			gituserlabels.push(d.language);
+	genChart = (index, gitmatchdata, gituserdata) => {
+		// try {
+		this.setState({
+			loadingText: `${index}, ${gitmatchdata}, ${gituserdata}`,
 		});
+		// 	let gituserdatas = [];
+		// 	let gitusercolors = [];
+		// 	let gitmatchdatas = [];
+		// 	let gitmatchcolors = [];
+		// 	let gitmatchlabels = [];
+		// 	let gituserlabels = [];
+		// 	// Gen GitUser Chart
+		// 	// gituserdata.forEach(d => {
+		// 	// 	gituserdatas.push(d.count);
+		// 	// 	gitusercolors.push(COLORS[d.language].color);
+		// 	// 	gituserlabels.push(d.language);
+		// 	// });
 
-		// Gen GitMatch Chart
-		gitmatchdata.forEach(d => {
-			gitmatchdatas.push(d.count);
-			gitmatchcolors.push(COLORS[d.language].color);
-			gitmatchlabels.push(d.language);
-		});
-		if (gituserdata.length === 0) {
-			this.setState({
-				chartData: {
-					GitMatchUser: this.state.chartData.GitMatchUser,
-					MatchedUser: {
-						data: {
-							labels: gitmatchlabels,
-							datasets: [
-								{
-									label: 'My First dataset',
-									data: gitmatchdatas,
-									backgroundColor: gitmatchcolors,
-								},
-							],
-						},
-						options: {
-							onClick: function(e) {
-								console.log(e);
-							},
-							responsive: true,
-							maintainAspectRatio: true,
-						},
-					},
-				},
-				index: index,
-			});
-		} else {
-			this.setState({
-				percent: 85,
-				chartData: {
-					GitMatchUser: {
-						data: {
-							labels: gituserlabels,
-							datasets: [
-								{
-									label: 'My First dataset',
-									data: gituserdatas,
-									backgroundColor: gitusercolors,
-								},
-							],
-						},
-						options: {
-							responsive: true,
-							maintainAspectRatio: false,
-						},
-					},
-					MatchedUser: {
-						data: {
-							labels: gitmatchlabels,
-							datasets: [
-								{
-									label: 'My First dataset',
-									data: gitmatchdatas,
-									backgroundColor: gitmatchcolors,
-								},
-							],
-						},
-						options: {
-							responsive: true,
-							maintainAspectRatio: false,
-						},
-					},
-				},
-			});
-		}
+		// 	// // Gen GitMatch Chart
+		// 	// gitmatchdata.forEach(d => {
+		// 	// 	gitmatchdatas.push(d.count);
+		// 	// 	gitmatchcolors.push(COLORS[d.language].color);
+		// 	// 	gitmatchlabels.push(d.language);
+		// 	// });
+
+		// 	if (gituserdata) {
+		// 		this.setState({
+		// 			percent: 80,
+		// 			loadingText: 'gen first chart',
+		// 			chartData: {
+		// 				GitMatchUser: this.state.chartData.GitMatchUser,
+		// 				MatchedUser: {
+		// 					data: {
+		// 						labels: gitmatchlabels,
+		// 						datasets: [
+		// 							{
+		// 								label: 'My First dataset',
+		// 								data: gitmatchdatas,
+		// 								backgroundColor: gitmatchcolors,
+		// 							},
+		// 						],
+		// 					},
+		// 					options: {
+		// 						onClick: function(e) {
+		// 							console.log(e);
+		// 						},
+		// 						responsive: true,
+		// 						maintainAspectRatio: true,
+		// 					},
+		// 				},
+		// 			},
+		// 			index: index,
+		// 		});
+		// 	} else {
+		// 		this.setState({
+		// 			percent: 85,
+		// 			chartData: {
+		// 				GitMatchUser: {
+		// 					data: {
+		// 						labels: gituserlabels,
+		// 						datasets: [
+		// 							{
+		// 								label: 'My First dataset',
+		// 								data: gituserdatas,
+		// 								backgroundColor: gitusercolors,
+		// 							},
+		// 						],
+		// 					},
+		// 					options: {
+		// 						responsive: true,
+		// 						maintainAspectRatio: false,
+		// 					},
+		// 				},
+		// 				MatchedUser: {
+		// 					data: {
+		// 						labels: gitmatchlabels,
+		// 						datasets: [
+		// 							{
+		// 								label: 'My First dataset',
+		// 								data: gitmatchdatas,
+		// 								backgroundColor: gitmatchcolors,
+		// 							},
+		// 						],
+		// 					},
+		// 					options: {
+		// 						responsive: true,
+		// 						maintainAspectRatio: false,
+		// 					},
+		// 				},
+		// 			},
+		// 		});
+		// 	}
+		// } catch (err) {
+		// 	this.setState({ loadingText: err });
+		// }
 	};
 	// Async Function that searchs github for users based on location and specific languages
 	getMatchedUsers = async (location, languageToken, uniqueLang) => {
@@ -477,9 +445,7 @@ easeInOutQuint
 		let usersData = [];
 
 		let usersResponse = await http.get(
-			`https://api.github.com/search/users?q=location:${this.encode(
-				location,
-			)}${languageToken}`,
+			`https://api.github.com/search/users?q=location:${this.encode(location)}${languageToken}`,
 			{ headers: headers },
 		);
 		// Create usersData array of user objects form of {userData:{},repos:{}}
@@ -503,10 +469,7 @@ easeInOutQuint
 				let reposHolder = {};
 				data.matchingLanguages = {};
 				data.repos.forEach(repo => {
-					if (
-						uniqueLang[repo.language] !== undefined &&
-						repo.language !== null
-					) {
+					if (uniqueLang[repo.language] !== undefined && repo.language !== null) {
 						// Check to see if this language has been used to calc repo score
 						// This algorihthm takes into account Unique Languages and matching top languages
 						if (data.matchingLanguages[repo.language] === undefined) {
@@ -517,8 +480,7 @@ easeInOutQuint
 							// if it has, give a slightly less weighted score
 						} else {
 							repoScore = repoScore + 1 * uniqueLang[repo.language];
-							data.matchingLanguages[repo.language] =
-								data.matchingLanguages[repo.language] + 1;
+							data.matchingLanguages[repo.language] = data.matchingLanguages[repo.language] + 1;
 						}
 
 						reposHolder[repo.language].push(repo);
@@ -586,10 +548,7 @@ easeInOutQuint
 			// Loop through repos to create a uniqelanguage object to parse into an array
 			repos.forEach(repo => {
 				if (repo.language !== undefined) {
-					if (
-						uniqueLang[repo.language] === undefined &&
-						repo.language !== null
-					) {
+					if (uniqueLang[repo.language] === undefined && repo.language !== null) {
 						reposHolder[repo.language] = [];
 
 						uniqueLang[repo.language] = 1;
@@ -639,22 +598,17 @@ easeInOutQuint
 				.then(userResponse => {
 					if (userResponse.status === 200) {
 						// await promise to resolve
-						http
-							.get(
-								`https://api.github.com/users/${username}/repos?page=1&per_page=100`,
-								{ headers: headers },
-							)
-							.then(
-								reposResponse => {
-									resolve({
-										userData: userResponse.data,
-										repos: reposResponse.data,
-									});
-								},
-								err => {
-									this.setState({ loadingText: err });
-								},
-							);
+						http.get(`https://api.github.com/users/${username}/repos?page=1&per_page=100`, { headers: headers }).then(
+							reposResponse => {
+								resolve({
+									userData: userResponse.data,
+									repos: reposResponse.data,
+								});
+							},
+							err => {
+								this.setState({ loadingText: err });
+							},
+						);
 						// then return an object literal with the properties userData and repos
 					} else {
 						console.log(userResponse.status);
@@ -739,11 +693,7 @@ easeInOutQuint
 					index={this.state.displayIndex}
 					changeIndex={this.changeIndex}
 				/>
-				<LoadingModal
-					loading={this.state.loading}
-					text={this.state.loadingText}
-					percent={this.state.percent}
-				/>
+				<LoadingModal loading={this.state.loading} text={this.state.loadingText} percent={this.state.percent} />
 				<OverlayModal loading={this.state.loading} />
 			</div>
 		);
