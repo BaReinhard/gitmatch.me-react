@@ -21,7 +21,7 @@ export default function GitMatchResults(props) {
 						unsetClass={props.unsetClass}
 					/>
 
-					<GitMatchResultCard
+					{/* <GitMatchResultCard
 						index={props.index}
 						getMyStars={props.getMyStars}
 						maxIndex={props.maxIndex}
@@ -31,7 +31,7 @@ export default function GitMatchResults(props) {
 						chartData={props.chartData.MatchedUser}
 						results={props.results}
 						chartClick={props.chartClick}
-					/>
+					/> */}
 				</Col>
 			</Grid>
 		);

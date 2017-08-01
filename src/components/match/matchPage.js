@@ -15,10 +15,11 @@ import Scroll from 'react-scroll';
 const headers = {
 	Authorization: `token ${ACCESS_TOKEN}`,
 };
+let defaultState = {};
 export class MatchPageComponent extends React.Component {
 	constructor(state, context) {
 		super(state, context);
-		this.state = {
+		this.state = defaultState = {
 			chartData: {
 				GitMatchUser: {},
 				MatchedUser: {},
@@ -60,6 +61,7 @@ export class MatchPageComponent extends React.Component {
 	}
 	// Submit Handler, main function that goes through the logic of finding user and matches
 	GitMatch = async event => {
+		this.clearState();
 		this.setState({
 			loading: true,
 			loadingText: 'Retrieving your information',
@@ -161,28 +163,73 @@ export class MatchPageComponent extends React.Component {
 				uniqueLang: languageResponse.uniqueLang,
 			},
 		];
-		await this.getStars(gitUser);
-		await this.getStars(matchUsersResponse);
-
-		console.log('got stars');
-		// Update State and Display New Matches
-		this.setState({
-			percent: 100,
+		this.getStars(gitUser).then(res => {
+			this.getStars(matchUsersResponse).then(ress => {
+				console.log('got stars');
+				// Update State and Display New Matches
+				this.setState({
+					percent: 100,
+				});
+				setTimeout(() => {
+					this.setState({
+						GitMatchUser: gitUser[0],
+						MatchingUsers: matchUsersResponse,
+						maxIndex: matchUsersResponse.length - 2,
+						results: true,
+						loading: false,
+					});
+					setTimeout(() => {
+						// this.scrollTo('resultsScroll');
+					}, 500);
+				}, 500);
+			});
 		});
-		setTimeout(() => {
-			this.setState({
-				GitMatchUser: gitUser[0],
-				MatchingUsers: matchUsersResponse,
-				maxIndex: matchUsersResponse.length - 2,
-				results: true,
-				loading: false,
-			});
-			Scroll.scroller.scrollTo('resultsScroll', {
-				duration: 1500,
-				delay: 100,
-				smooth: true,
-			});
-		}, 500);
+	};
+	scrollTo = (
+		element = '',
+		duration = 1500,
+		delay = 100,
+		smooth = 'true',
+		offset = -50,
+	) => {
+		/*
+
+		Other options for smooth
+linear
+	- no easing, no acceleration.
+easeInQuad
+	- accelerating from zero velocity.
+easeOutQuad
+	- decelerating to zero velocity.
+easeInOutQuad
+	- acceleration until halfway, then deceleration.
+easeInCubic
+	- accelerating from zero velocity.
+easeOutCubic
+	- decelerating to zero velocity.
+easeInOutCubic
+	- acceleration until halfway, then deceleration.
+easeInQuart
+	- accelerating from zero velocity.
+easeOutQuart
+	- decelerating to zero velocity.
+easeInOutQuart
+	-  acceleration until halfway, then deceleration.
+easeInQuint
+	- accelerating from zero velocity.
+easeOutQuint
+	- decelerating to zero velocity.
+easeInOutQuint
+	- acceleration until halfway, then deceleration.
+		*/
+		let options = {
+			duration: duration,
+			delay: delay,
+			smooth: smooth,
+			offset: offset,
+		};
+		console.log(options);
+		Scroll.scroller.scrollTo(element, options);
 	};
 	closeRepoModal = () => {
 		this.setState({
@@ -191,6 +238,10 @@ export class MatchPageComponent extends React.Component {
 				matchingLanguages: undefined,
 			},
 		});
+	};
+	clearState = () => {
+		defaultState.username = this.state.username;
+		this.setState(defaultState);
 	};
 	changeIndex = index => {
 		this.setState({
@@ -422,9 +473,9 @@ export class MatchPageComponent extends React.Component {
 	};
 	// Async Function that searchs github for users based on location and specific languages
 	getMatchedUsers = async (location, languageToken, uniqueLang) => {
-		console.log('Data dump', location, languageToken, uniqueLang);
 		let promises = [];
 		let usersData = [];
+
 		let usersResponse = await http.get(
 			`https://api.github.com/search/users?q=location:${this.encode(
 				location,
@@ -433,6 +484,7 @@ export class MatchPageComponent extends React.Component {
 		);
 		// Create usersData array of user objects form of {userData:{},repos:{}}
 		usersResponse.data.items.forEach(user => {
+			this.setState({ loadingText: user.login });
 			promises.push(
 				this.getUserRepoData(user.login).then(newResponse => {
 					usersData.push(newResponse);
@@ -440,62 +492,63 @@ export class MatchPageComponent extends React.Component {
 			);
 		});
 		// Wait for All HTTP requests to finish before parsing the usersData array to create matching Languages and scores for each User
-		await Promise.all(promises);
-		// Parse array to create a Score for each user
-		this.setState({
-			loadingText: 'Calculating Match Score',
-			percent: 20,
-		});
-		usersData.forEach(data => {
-			let repoScore = 0;
-			let reposHolder = {};
-			data.matchingLanguages = {};
-			data.repos.forEach(repo => {
-				if (
-					uniqueLang[repo.language] !== undefined &&
-					repo.language !== null
-				) {
-					// Check to see if this language has been used to calc repo score
-					// This algorihthm takes into account Unique Languages and matching top languages
-					if (data.matchingLanguages[repo.language] === undefined) {
-						reposHolder[repo.language] = [];
-						// if it hasn't give a weighted score for a newly matched language (weighted heavier than each additional repo lang)
-						repoScore = repoScore + uniqueLang[repo.language] * 100;
-						data.matchingLanguages[repo.language] = 1;
-						// if it has, give a slightly less weighted score
-					} else {
-						repoScore = repoScore + 1 * uniqueLang[repo.language];
-						data.matchingLanguages[repo.language] =
-							data.matchingLanguages[repo.language] + 1;
-					}
-
-					reposHolder[repo.language].push(repo);
-				}
+		Promise.all(promises).then(res => {
+			// Parse array to create a Score for each user
+			this.setState({
+				loadingText: 'Calculating Match Score',
+				percent: 20,
 			});
+			usersData.forEach(data => {
+				let repoScore = 0;
+				let reposHolder = {};
+				data.matchingLanguages = {};
+				data.repos.forEach(repo => {
+					if (
+						uniqueLang[repo.language] !== undefined &&
+						repo.language !== null
+					) {
+						// Check to see if this language has been used to calc repo score
+						// This algorihthm takes into account Unique Languages and matching top languages
+						if (data.matchingLanguages[repo.language] === undefined) {
+							reposHolder[repo.language] = [];
+							// if it hasn't give a weighted score for a newly matched language (weighted heavier than each additional repo lang)
+							repoScore = repoScore + uniqueLang[repo.language] * 100;
+							data.matchingLanguages[repo.language] = 1;
+							// if it has, give a slightly less weighted score
+						} else {
+							repoScore = repoScore + 1 * uniqueLang[repo.language];
+							data.matchingLanguages[repo.language] =
+								data.matchingLanguages[repo.language] + 1;
+						}
 
-			// Level the score with a natural log and multiply by the gitmatch factor and floor it to a nice integer
-			data.score = Math.floor(Math.log(repoScore) * 10.1231234113);
-			let matchingLanguagesHolder = [];
-			for (var key in data.matchingLanguages) {
-				// skip loop if the property is from prototype
-				if (!data.matchingLanguages.hasOwnProperty(key)) continue;
-				matchingLanguagesHolder.push({
-					language: key,
-					count: data.matchingLanguages[key],
-					reposDetails: reposHolder[key],
+						reposHolder[repo.language].push(repo);
+					}
 				});
-			}
-			// Create a matchingLanguages property on matchedUsers object and give the value of the array of matchingLanguages
-			data.matchingLanguages = matchingLanguagesHolder;
-			// Sort the matching Languages array in descending order
-			data.matchingLanguages.sort((a, b) => {
-				if (a.count < b.count) {
-					return 1;
-				} else if (a.count > b.count) {
-					return -1;
-				} else {
-					return 0;
+
+				// Level the score with a natural log and multiply by the gitmatch factor and floor it to a nice integer
+				data.score = Math.floor(Math.log(repoScore) * 10.1231234113);
+				let matchingLanguagesHolder = [];
+				for (var key in data.matchingLanguages) {
+					// skip loop if the property is from prototype
+					if (!data.matchingLanguages.hasOwnProperty(key)) continue;
+					matchingLanguagesHolder.push({
+						language: key,
+						count: data.matchingLanguages[key],
+						reposDetails: reposHolder[key],
+					});
 				}
+				// Create a matchingLanguages property on matchedUsers object and give the value of the array of matchingLanguages
+				data.matchingLanguages = matchingLanguagesHolder;
+				// Sort the matching Languages array in descending order
+				data.matchingLanguages.sort((a, b) => {
+					if (a.count < b.count) {
+						return 1;
+					} else if (a.count > b.count) {
+						return -1;
+					} else {
+						return 0;
+					}
+				});
 			});
 		});
 		// Finally sort the array of matchedUser objects in descending order by score
@@ -576,31 +629,41 @@ export class MatchPageComponent extends React.Component {
 		});
 	};
 	// Async function that gets userdata and repo data for each username
-	getUserRepoData = async username => {
-		// Get UserData, and wait for it to return before getting repos
-		let userResponse = await http.get(
-			`https://api.github.com/users/${username}`,
-			{
-				headers: headers,
-			},
-		);
-		// Check to see that the response is valid, if it is then get repos
-		if (userResponse.status === 200) {
-			// await promise to resolve
-			let reposResponse = await http.get(
-				`https://api.github.com/users/${username}/repos?page=1&per_page=100`,
-				{ headers: headers },
-			);
-			// then return an object literal with the properties userData and repos
-			return {
-				userData: userResponse.data,
-				repos: reposResponse.data,
-			};
-		} else {
-			console.log(userResponse.status);
-			// if status isn't 200, handle custom error message
-			this.errorHandler('Could not get username');
-		}
+	getUserRepoData = username => {
+		return new Promise((resolve, reject) => {
+			// Get UserData, and wait for it to return before getting repos
+			http
+				.get(`https://api.github.com/users/${username}`, {
+					headers: headers,
+				})
+				.then(userResponse => {
+					if (userResponse.status === 200) {
+						// await promise to resolve
+						http
+							.get(
+								`https://api.github.com/users/${username}/repos?page=1&per_page=100`,
+								{ headers: headers },
+							)
+							.then(
+								reposResponse => {
+									resolve({
+										userData: userResponse.data,
+										repos: reposResponse.data,
+									});
+								},
+								err => {
+									this.setState({ loadingText: err });
+								},
+							);
+						// then return an object literal with the properties userData and repos
+					} else {
+						console.log(userResponse.status);
+						// if status isn't 200, handle custom error message
+						this.errorHandler('Could not get username');
+					}
+				});
+			// Check to see that the response is valid, if it is then get repos
+		});
 
 		// Check Response Data for whether response index is a repo list or userData
 	};

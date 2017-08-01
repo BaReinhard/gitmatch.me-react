@@ -55,27 +55,37 @@ const RepoCard = props => {
 								return (
 									<tr key={i}>
 										<td className="col-sm-8">
-											<i
-												className="fa fa-github"
-												aria-hidden="true"
-											/>{' '}
 											<a target="_blank" href={repo.html_url}>
+												<i
+													className="fa fa-github"
+													aria-hidden="true"
+												/>{' '}
 												{repo.name}
 											</a>
 										</td>
 										<td className="col-sm-2">
-											<i
-												className="fa fa-star"
-												aria-hidden="true"
-											/>{' '}
-											{repo.stargazers_count}
+											<a
+												target="_blank"
+												href={repo.html_url + '/stargazers'}
+											>
+												<i
+													className="fa fa-star"
+													aria-hidden="true"
+												/>{' '}
+												{repo.stargazers_count}
+											</a>
 										</td>
 										<td className="col-sm-2">
-											<i
-												className="fa fa-code-fork"
-												aria-hidden="true"
-											/>{' '}
-											{repo.forks_count}
+											<a
+												target="_blank"
+												href={repo.html_url + '/network/members'}
+											>
+												<i
+													className="fa fa-code-fork"
+													aria-hidden="true"
+												/>{' '}
+												{repo.forks_count}
+											</a>
 										</td>
 									</tr>
 								);
@@ -141,7 +151,10 @@ const RepoCard = props => {
 											</a>
 										</td>
 										<td className="col-sm-2">
-											<a href={repo.html_url + '/stargazers'}>
+											<a
+												target="_blank"
+												href={repo.html_url + '/stargazers'}
+											>
 												<i
 													className="fa fa-star"
 													aria-hidden="true"
@@ -150,11 +163,16 @@ const RepoCard = props => {
 											</a>
 										</td>
 										<td className="col-sm-2">
-											<i
-												className="fa fa-code-fork"
-												aria-hidden="true"
-											/>{' '}
-											{repo.forks_count}
+											<a
+												target="_blank"
+												href={repo.html_url + '/network/members'}
+											>
+												<i
+													className="fa fa-code-fork"
+													aria-hidden="true"
+												/>{' '}
+												{repo.forks_count}
+											</a>
 										</td>
 									</tr>
 								);
