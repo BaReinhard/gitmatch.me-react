@@ -1,5 +1,5 @@
 import React from 'react';
-import GitMatchChart from './chart';
+import GitMatchChart from '../common/chart';
 import { Grid, Row, Col, Thumbnail } from 'react-bootstrap';
 import Waypoint from 'react-waypoint';
 

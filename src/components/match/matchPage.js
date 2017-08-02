@@ -1,7 +1,7 @@
 import React from 'react';
 import http from 'axios';
-import GitMatchForm from '../common/form';
-import GitMatchResults from '../common/results';
+import GitMatchForm from './form';
+import GitMatchResults from './results';
 import { Modal, Grid } from 'react-bootstrap';
 import { GEOCODING, ACCESS_TOKEN, COLORS } from '../../.constants';
 import LoadingModal from '../common/loading';
@@ -603,6 +603,7 @@ export class MatchPageComponent extends React.Component {
 		let response = await http.get(
 			`https://maps.googleapis.com/maps/api/geocode/json?address=${location}&key=${GEOCODING}`,
 		);
+		console.log(response);
 		return response.data.results[0].address_components[0].short_name.toLowerCase();
 	};
 	// Handles each input on the form and sets it to state
