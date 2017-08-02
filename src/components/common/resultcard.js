@@ -1,7 +1,7 @@
 import React from 'react';
 import GitMatchChart from './chart';
 import { Grid, Row, Col, Thumbnail } from 'react-bootstrap';
-// import Waypoint from 'react-waypoint';
+import Waypoint from 'react-waypoint';
 
 export default function GitMatchResultCard(props) {
 	// Returns for User Searching for a match
@@ -10,31 +10,18 @@ export default function GitMatchResultCard(props) {
 		return (
 			<Col id="resultsScroll" xs={12} md={6}>
 				<Row>
-					<button
-						style={{ float: 'left', opacity: '0' }}
-						className="btn btn-default"
-					>
+					<button style={{ float: 'left', opacity: '0' }} className="btn btn-default">
 						Previous
 					</button>
-					<button
-						style={{ float: 'right', opacity: '0' }}
-						className="btn btn-default hidden"
-					>
+					<button style={{ float: 'right', opacity: '0' }} className="btn btn-default hidden">
 						Next
 					</button>
 				</Row>
 				<br />
 
-				<div
-					className="information-container"
-					style={{ minHeight: '300px' }}
-				>
+				<div className="information-container" style={{ minHeight: '300px' }}>
 					<Col xs={4} md={4}>
-						<Thumbnail
-							target="_blank"
-							href={props.user.userData.html_url}
-							src={props.user.userData.avatar_url}
-						/>
+						<Thumbnail target="_blank" href={props.user.userData.html_url} src={props.user.userData.avatar_url} />
 					</Col>
 					<Col xs={12} md={12}>
 						<h3>Match</h3>
@@ -43,7 +30,24 @@ export default function GitMatchResultCard(props) {
 						</h4>
 						<h3>Stars</h3>
 						<p>
-							{props.user.stars}
+							{props.user.stars === false
+								? <button className="btn btn-info" onClick={props.getMyStars}>
+										Update My Stars
+									</button>
+								: props.user.stars === 'error'
+									? <span>
+											{' '}<button className="btn btn-info" onClick={props.getMyStars}>
+												Update My Stars
+											</button>
+											<span>
+												There was an error retrieving {props.user.userData.login}'s stars, Unfortunately,{' '}
+												<a href={`http://git-awards.com/users/search?login=${props.user.userData.login}`}>
+													Git-Awards
+												</a>{' '}
+												doesn't have their data on file
+											</span>
+										</span>
+									: props.user.stars}
 						</p>
 					</Col>
 					<div>
@@ -59,10 +63,7 @@ export default function GitMatchResultCard(props) {
 					chartClick={props.chartClick}
 				/>
 				<hr />
-				{/* <Waypoint
-					onEnter={props.setClass}
-					onLeave={props.unsetClass}
-				/> */}
+				<Waypoint onEnter={props.setClass} onLeave={props.unsetClass} />
 			</Col>
 		);
 		// Returns for Matched Users
@@ -71,39 +72,20 @@ export default function GitMatchResultCard(props) {
 			<Col xs={12} md={6} key={props.key}>
 				<Row>
 					{props.index > 0
-						? <button
-								style={{ float: 'left' }}
-								className="btn btn-default"
-								onClick={props.previousMatch}
-							>
+						? <button style={{ float: 'left' }} className="btn btn-default" onClick={props.previousMatch}>
 								Previous
 							</button>
 						: <div />}
 					{props.index < props.maxIndex
-						? <button
-								style={{ float: 'right' }}
-								className="btn btn-default"
-								onClick={props.nextMatch}
-							>
+						? <button style={{ float: 'right' }} className="btn btn-default" onClick={props.nextMatch}>
 								Next
 							</button>
 						: <div />}
 				</Row>
 				<br />
-				<div
-					className="information-container"
-					style={{ minHeight: '300px' }}
-				>
-					<Col
-						xs={4}
-						md={4}
-						style={{ textAlign: 'center', margin: '0 auto' }}
-					>
-						<Thumbnail
-							target="_blank"
-							href={props.user.userData.html_url}
-							src={props.user.userData.avatar_url}
-						/>
+				<div className="information-container" style={{ minHeight: '300px' }}>
+					<Col xs={4} md={4} style={{ textAlign: 'center', margin: '0 auto' }}>
+						<Thumbnail target="_blank" href={props.user.userData.html_url} src={props.user.userData.avatar_url} />
 					</Col>
 					<Col xs={12} md={12}>
 						<h3>Top Match</h3>
@@ -113,28 +95,17 @@ export default function GitMatchResultCard(props) {
 						<h3>Stars</h3>
 						<p>
 							{props.user.stars === false
-								? <button
-										className="btn btn-info"
-										onClick={props.getMyStars}
-									>
+								? <button className="btn btn-info" onClick={props.getMyStars}>
 										Update My Stars
 									</button>
 								: props.user.stars === 'error'
 									? <span>
-											{' '}<button
-												className="btn btn-info"
-												onClick={props.getMyStars}
-											>
+											{' '}<button className="btn btn-info" onClick={props.getMyStars}>
 												Update My Stars
 											</button>
 											<span>
-												There was an error retrieving{' '}
-												{props.user.userData.login}'s stars,
-												Unfortunately,{' '}
-												<a
-													href={`http://git-awards.com/users/search?login=${props
-														.user.userData.login}`}
-												>
+												There was an error retrieving {props.user.userData.login}'s stars, Unfortunately,{' '}
+												<a href={`http://git-awards.com/users/search?login=${props.user.userData.login}`}>
 													Git-Awards
 												</a>{' '}
 												doesn't have their data on file

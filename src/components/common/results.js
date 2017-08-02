@@ -4,7 +4,6 @@ import { Col, Grid } from 'react-bootstrap';
 
 export default function GitMatchResults(props) {
 	let results;
-	console.log(props);
 	if (!props.results & !props.loading) {
 		results = <div />;
 	} else {
@@ -21,7 +20,7 @@ export default function GitMatchResults(props) {
 						unsetClass={props.unsetClass}
 					/>
 
-					{/* <GitMatchResultCard
+					<GitMatchResultCard
 						index={props.index}
 						getMyStars={props.getMyStars}
 						maxIndex={props.maxIndex}
@@ -31,7 +30,7 @@ export default function GitMatchResults(props) {
 						chartData={props.chartData.MatchedUser}
 						results={props.results}
 						chartClick={props.chartClick}
-					/> */}
+					/>
 				</Col>
 			</Grid>
 		);

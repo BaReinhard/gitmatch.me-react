@@ -1,5 +1,4 @@
-export const ACCESS_TOKEN =
-	'1653e3ac6a5c13a14286e5f670136583e90435b1';
+export const ACCESS_TOKEN = '23401ff04c76d978aa8e6dcc998170bdbe716fb4';
 export const GEOLOCATION = 'AIzaSyDq_4w29UnixwnRvseoYhJnH2ZUL7uTo84';
 export const GEOCODING = 'AIzaSyDq_4w29UnixwnRvseoYhJnH2ZUL7uTo84';
 export const COLORS = {
