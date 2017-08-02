@@ -9,12 +9,12 @@
 # production
 /build
 
+
 # Binary
 *.zip
 
 # Constants
 /src/*constant*
-
 
 # misc
 .DS_Store
