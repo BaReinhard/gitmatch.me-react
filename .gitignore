@@ -14,7 +14,7 @@
 *.zip
 
 # Constants
-/src/*constant*
+/src/.constants.js
 
 # misc
 .DS_Store
