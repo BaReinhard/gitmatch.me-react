@@ -572,6 +572,7 @@ export class MatchPageComponent extends React.Component {
 		let reposResponse = await http.get(`https://api.github.com/users/${username}/repos?page=1&per_page=100`, {
 			headers: headers,
 		});
+		// This needs rework as it doesn't get the top 5 stars, but the top 5 users from the initial git request
 		if (index < 0) {
 			starsResponse = await http
 				.get(`https://crossorigin.me/http://git-awards.com/api/v0/users/${username}`)
