@@ -572,7 +572,7 @@ export class MatchPageComponent extends React.Component {
 		let reposResponse = await http.get(`https://api.github.com/users/${username}/repos?page=1&per_page=100`, {
 			headers: headers,
 		});
-		if (index < 5) {
+		if (index < 0) {
 			starsResponse = await http
 				.get(`https://crossorigin.me/http://git-awards.com/api/v0/users/${username}`)
 				.then(response => {
