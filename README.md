@@ -10,3 +10,6 @@ A working Prototype can be seen at http://bareinhard.net/gitmatch-react
 # Latest Feature!
 Click on the users chart to view list of repos!
 Then Click on the Repos in the Repos Modal box!
+
+# issues
+doesnt work with ios9.X due to browser incompatibilities. will be working on an ejected version to allow for this later, but have now moved on to the location portion of it.
