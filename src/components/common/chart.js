@@ -7,19 +7,15 @@ export default class GitMatchChart extends React.Component {
 	}
 
 	componentDidMount() {
-		this.props.chartClick(this.refs['me']);
+		if (this.props.chartClick !== undefined) {
+			this.props.chartClick(this.refs['me']);
+		}
 	}
 	render() {
-		return (
-			<Col md={12} xs={12}>
-				<Doughnut
-					data={this.props.chartData}
-					options={this.props.chartOptions}
-					ref={'me'}
-					width={500}
-					height={500}
-				/>
-			</Col>
-		);
+		return this.props.chartData !== undefined
+			? <Col md={12} xs={12}>
+					<Doughnut data={this.props.chartData} options={this.props.chartOptions} ref={'me'} width={500} height={500} />
+				</Col>
+			: <div />;
 	}
 }

@@ -14,11 +14,10 @@ import {
 
 const overlay = (
 	<Tooltip id="tooltip">
-		<strong>Search By Your Username</strong>
+		<strong>Search By Location</strong>
 	</Tooltip>
 );
-
-export default function GitMatchForm(props) {
+export default function GitLocationForm(props) {
 	const formStyle = {
 		color: 'black',
 		backgroundImage: 'url(' + props.background + ')',
@@ -73,7 +72,7 @@ export default function GitMatchForm(props) {
 							/>
 							<InputGroup.Button>
 								<Button type="submit">
-									<span className="fa fa-user-circle" /> MatchMe
+									<span className="fa fa-user-circle" /> LocateDevs
 								</Button>
 							</InputGroup.Button>
 						</InputGroup>

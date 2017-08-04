@@ -417,13 +417,15 @@ export class MatchPageComponent extends React.Component {
 			{ headers: headers },
 		);
 		// Create usersData array of user objects form of {userData:{},repos:{}}
+		debugger;
 		promises = usersResponse.data.items.map((user, index) =>
 			this.getUserRepoData(user.login, index).then(newResponse => {
 				return newResponse;
 			}),
 		);
+		debugger;
 		let usersData = await Promise.all(promises);
-
+		debugger;
 		// for (let promise of promises) {
 		// 	let val = await promise;
 		// 	usersData.push(val);
