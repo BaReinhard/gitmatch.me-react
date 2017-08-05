@@ -15,7 +15,7 @@ export default function GitMatchResults(props) {
 						user={props.GitMatchUser}
 						chartData={props.chartData.GitMatchUser}
 						results={props.results}
-						chartClick={props.chartClick}
+						bindRef={props.bindRef}
 						setClass={props.setClass}
 						unsetClass={props.unsetClass}
 					/>
@@ -29,7 +29,7 @@ export default function GitMatchResults(props) {
 						user={props.MatchingUsers[props.index]}
 						chartData={props.chartData.MatchedUser}
 						results={props.results}
-						chartClick={props.chartClick}
+						bindRef={props.bindRef}
 					/>
 				</Col>
 			</Grid>

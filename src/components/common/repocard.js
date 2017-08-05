@@ -67,6 +67,7 @@ const RepoCard = props => {
 			</Modal>
 		);
 	} else if (props.user.matchingLanguages !== undefined) {
+		debugger;
 		console.log('matching', props.user.matchingLanguages);
 		return (
 			<Modal show={true} dialogClassName="custom-modal" style={repoCardStyle}>

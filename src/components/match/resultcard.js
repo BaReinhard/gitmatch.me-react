@@ -60,7 +60,8 @@ export default function GitMatchResultCard(props) {
 				<GitMatchChart
 					chartData={props.chartData.data}
 					chartOptions={props.chartData.options}
-					chartClick={props.chartClick}
+					bindRef={props.bindRef}
+					refName={'GitMatchUser'}
 				/>
 				<hr />
 				<Waypoint onEnter={props.setClass} onLeave={props.unsetClass} />
@@ -125,10 +126,10 @@ export default function GitMatchResultCard(props) {
 				</div>
 
 				<GitMatchChart
-					getRefs={props.getRefs}
+					refName={'MatchedUser'}
+					bindRef={props.bindRef}
 					chartData={props.chartData.data}
 					chartOptions={props.chartData.options}
-					chartClick={props.chartClick}
 				/>
 
 				<hr />

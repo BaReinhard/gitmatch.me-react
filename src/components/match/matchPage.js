@@ -199,6 +199,37 @@ export class MatchPageComponent extends React.Component {
 			displayIndex: index,
 		});
 	};
+	bindRefs = (ele, refName) => {
+		if (refName === 'MatchUser') {
+			ele.chart_instance.canvas.onclick = function(e, index) {
+				let repos = '';
+				let activePoints = ele.chart_instance.getElementsAtEvent(e);
+				let firstPoint = activePoints[0];
+				if (firstPoint) {
+					this.setState({
+						GitUserRepo: undefined,
+						displayMatchUserRepo: true,
+						MatchUserRepo: this.state.MatchingUsers[this.state.index],
+						displayIndex: firstPoint._index,
+					});
+				}
+			}.bind(this);
+		} else if (refName === 'GitMatchUser') {
+			ele.chart_instance.canvas.onclick = function(e, index) {
+				let repos = '';
+				let activePoints = ele.chart_instance.getElementsAtEvent(e);
+				let firstPoint = activePoints[0];
+				if (firstPoint) {
+					this.setState({
+						MatchUserRepo: undefined,
+						displayGitUserRepo: true,
+						GitUserRepo: this.state.GitMatchUser,
+						displayIndex: firstPoint._index,
+					});
+				}
+			}.bind(this);
+		}
+	};
 	chartClick = ele => {
 		ele.onClick = e => {
 			console.log(e);
@@ -656,7 +687,7 @@ export class MatchPageComponent extends React.Component {
 					MatchingUsers={this.state.MatchingUsers}
 					chartData={this.state.chartData}
 					getMyStars={this.getMyStars}
-					chartClick={this.chartClick}
+					bindRef={this.bindRefs}
 					setClass={this.setClass}
 					unsetClass={this.unsetClass}
 				/>

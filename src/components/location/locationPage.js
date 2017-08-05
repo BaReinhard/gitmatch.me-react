@@ -20,9 +20,18 @@ const headers = {
 const defaultState = {
 	defaultShownLanguages: ['JavaScript', 'Python', 'C'],
 	location: '',
+	displayRepoCard: false,
 	selectedLanguages: ['JavaScript', 'Python', 'C'],
 	topLocationUsers: [],
 	topMatchUsers: [],
+	elements: [],
+	displayIndex: 0,
+	starIndex: 0,
+	locationIndex: 0,
+	LocationMatchUsers: [],
+	TopStarUsers: [],
+	currentTopStarUser: { matchingLanguages: undefined },
+	currentLocationUser: { matchingLanguages: undefined },
 	chartData: {
 		LocationMatchUser: { data: undefined },
 		StarMatchUser: { data: undefined },
@@ -108,7 +117,7 @@ export class LocationPageComponent extends React.Component {
 			LocationParam = 'los%20angeles';
 		}
 		let token = `location:${LocationParam}`;
-		selectedLanguages.forEach(lang => (token += `+location:${lang}`));
+		selectedLanguages.forEach(lang => (token += `+language:${lang}`));
 		return token;
 	};
 	getUserRepoData = async (username, index = 0, stars = undefined) => {
@@ -132,7 +141,7 @@ export class LocationPageComponent extends React.Component {
 			});
 			if (index < 5 && stars === undefined) {
 				starsResponse = await http
-					.get(`https://crossorigin.me/http://git-awards.com/api/v0/users/${username}`)
+					.get(`https://crossorasdigin.me/http://git-awards.com/api/v0/users/${username}`)
 					.then(response => {
 						let stars = 0;
 						response.data.user.rankings.forEach(rank => {
@@ -146,10 +155,26 @@ export class LocationPageComponent extends React.Component {
 			} else if (stars !== undefined) {
 				starsResponse = stars;
 			}
+			let matchingLanguages = [];
+			if (reposResponse.data.length) {
+				let uniqueLang = {};
+				reposResponse.data.forEach((repo, index) => {
+					if (uniqueLang[repo.language] === undefined && repo.language !== null) {
+						uniqueLang[repo.language] = index;
+						matchingLanguages.push({ language: repo.language, count: 1, reposDetails: [repo] });
+					} else if (repo.language !== null) {
+						matchingLanguages[uniqueLang[repo.language]].count++;
+						matchingLanguages[uniqueLang[repo.language]].reposDetails.push(repo);
+					}
+				});
+			} else {
+				matchingLanguages = [];
+			}
 			return {
 				userData: userResponse.data,
 				repos: reposResponse.data,
 				stars: starsResponse,
+				matchingLanguages: matchingLanguages,
 			};
 		} catch (err) {
 			return false;
@@ -161,7 +186,7 @@ export class LocationPageComponent extends React.Component {
 			console.info('Users Response inside get Star', usersResponse);
 			// Get UserData and Repos, starts the promises concurrently, and stores them synchronously
 			let promises = usersResponse.data.items.map((user, index) => {
-				return this.getUserRepoData(user.login, 6).then(res => res);
+				return this.getUserRepoData(user.login, 6);
 			});
 			let localUsers = [];
 
@@ -187,7 +212,7 @@ export class LocationPageComponent extends React.Component {
 			if (location !== undefined) {
 				console.info('Getting Top Star Users');
 				let locationTopStarUsers = await http(
-					`https://crossorigin.me/http://git-awards.com/api/v0/users?city=${location}&language=${topLanguage}`,
+					`https://crossorasdsigin.me/http://git-awards.com/api/v0/users?city=${location}&language=${topLanguage}`,
 				);
 				console.info('Top Star Users', locationTopStarUsers);
 				return locationTopStarUsers.users;
@@ -496,39 +521,39 @@ export class LocationPageComponent extends React.Component {
 	};
 	getChartData = usersData => {
 		usersData.forEach(data => {
-			console.log('UserData Data', data);
-			let reposHolder = {};
-			data.matchingLanguages = {};
-			data.repos.forEach(repo => {
-				if (repo.language !== null) {
-					// Check to see if this language has been used to calc repo score
-					// This algorihthm takes into account Unique Languages and matching top languages
-					if (data.matchingLanguages[repo.language] === undefined) {
-						reposHolder[repo.language] = [];
-						// if it hasn't give a weighted score for a newly matched language (weighted heavier than each additional repo lang)
-						data.matchingLanguages[repo.language] = 1;
-						// if it has, give a slightly less weighted score
-					} else {
-						data.matchingLanguages[repo.language] = data.matchingLanguages[repo.language] + 1;
-					}
+			// console.log('UserData Data', data);
+			// let reposHolder = {};
+			// data.matchingLanguages = {};
+			// data.repos.forEach(repo => {
+			// 	if (repo.language !== null) {
+			// 		// Check to see if this language has been used to calc repo score
+			// 		// This algorihthm takes into account Unique Languages and matching top languages
+			// 		if (data.matchingLanguages[repo.language] === undefined) {
+			// 			reposHolder[repo.language] = [];
+			// 			// if it hasn't give a weighted score for a newly matched language (weighted heavier than each additional repo lang)
+			// 			data.matchingLanguages[repo.language] = 1;
+			// 			// if it has, give a slightly less weighted score
+			// 		} else {
+			// 			data.matchingLanguages[repo.language] = data.matchingLanguages[repo.language] + 1;
+			// 		}
 
-					reposHolder[repo.language].push(repo);
-				}
-			});
+			// 		reposHolder[repo.language].push(repo);
+			// 	}
+			// });
 
-			// Level the score with a natural log and multiply by the gitmatch factor and floor it to a nice integer
-			let matchingLanguagesHolder = [];
-			for (var key in data.matchingLanguages) {
-				// skip loop if the property is from prototype
-				if (!data.matchingLanguages.hasOwnProperty(key)) continue;
-				matchingLanguagesHolder.push({
-					language: key,
-					count: data.matchingLanguages[key],
-					reposDetails: reposHolder[key],
-				});
-			}
-			// Create a matchingLanguages property on StarMatchUsers object and give the value of the array of matchingLanguages
-			data.matchingLanguages = matchingLanguagesHolder;
+			// // Level the score with a natural log and multiply by the gitmatch factor and floor it to a nice integer
+			// let matchingLanguagesHolder = [];
+			// for (var key in data.matchingLanguages) {
+			// 	// skip loop if the property is from prototype
+			// 	if (!data.matchingLanguages.hasOwnProperty(key)) continue;
+			// 	matchingLanguagesHolder.push({
+			// 		language: key,
+			// 		count: data.matchingLanguages[key],
+			// 		reposDetails: reposHolder[key],
+			// 	});
+			// }
+			// // Create a matchingLanguages property on StarMatchUsers object and give the value of the array of matchingLanguages
+			// data.matchingLanguages = matchingLanguagesHolder;
 			// Sort the matching Languages array in descending order
 			data.matchingLanguages.sort((a, b) => {
 				if (a.count < b.count) {
@@ -549,10 +574,6 @@ export class LocationPageComponent extends React.Component {
 	};
 	genChart = (starIndex, locationIndex, starUserData, locationUserData) => {
 		try {
-			this.setState({
-				percent: 50,
-				loadingText: `Generating Charts`,
-			});
 			let locationUserCountData = [];
 			let locationUserColors = [];
 			let starUserCountData = [];
@@ -576,7 +597,7 @@ export class LocationPageComponent extends React.Component {
 			});
 
 			this.setState({
-				percent: 85,
+				percent: 75,
 				chartData: {
 					LocationMatchUser: {
 						data: {
@@ -623,8 +644,8 @@ export class LocationPageComponent extends React.Component {
 			this.genChart(
 				this.state.starIndex - 1,
 				this.state.locationIndex - 1,
-				this.state.LocationMatchUsers[this.state.locationIndex - 1].matchingLanguages,
 				this.state.TopStarUsers[this.state.starIndex - 1].matchingLanguages,
+				this.state.LocationMatchUsers[this.state.locationIndex - 1].matchingLanguages,
 			);
 		} catch (err) {
 			console.error(err);
@@ -635,36 +656,138 @@ export class LocationPageComponent extends React.Component {
 			this.genChart(
 				this.state.starIndex + 1,
 				this.state.locationIndex + 1,
-				this.state.LocationMatchUsers[this.state.locationIndex + 1].matchingLanguages,
 				this.state.TopStarUsers[this.state.starIndex + 1].matchingLanguages,
+				this.state.LocationMatchUsers[this.state.locationIndex + 1].matchingLanguages,
 			);
 		} catch (err) {
 			console.error(err);
 		}
 	};
+	bindRefs = (ele, refName) => {
+		if (refName === 'Location') {
+			ele.chart_instance.canvas.onclick = function(e, index) {
+				let repos = '';
+				let activePoints = ele.chart_instance.getElementsAtEvent(e);
+				let firstPoint = activePoints[0];
+				if (firstPoint) {
+					this.setState({
+						currentLocationUser: this.state.LocationMatchUsers[this.state.locationIndex],
+						displayGitUserRepo: true,
+						currentTopStarUser: undefined,
+						displayIndex: firstPoint._index,
+					});
+				}
+			}.bind(this);
+		} else if (refName === 'Star') {
+			ele.chart_instance.canvas.onclick = function(e, index) {
+				let repos = '';
+				let activePoints = ele.chart_instance.getElementsAtEvent(e);
+				let firstPoint = activePoints[0];
+				if (firstPoint) {
+					console.log('showing matched users repo');
+					this.setState({
+						currentLocationUser: undefined,
+						displayGitUserRepo: true,
+						currentTopStarUser: this.state.TopStarUsers[this.state.starIndex],
+						displayIndex: firstPoint._index,
+					});
+				}
+			}.bind(this);
+		}
+	};
 
+	chartClickStar = ele => {
+		ele.onClick = e => {
+			console.log(e);
+		};
+
+		ele.chart_instance.canvas.onclick = (e, index) => {
+			let repos = '';
+			let activePoints = ele.chart_instance.getElementsAtEvent(e);
+			let firstPoint = activePoints[0];
+			if (firstPoint) {
+				console.log('showing matched users repo');
+				this.setState({
+					currentLocationUser: undefined,
+					displayGitUserRepo: true,
+					currentTopStarUser: this.state.TopStarUsers[this.state.starIndex],
+					displayIndex: firstPoint._index,
+				});
+			}
+		};
+
+		let newElements = this.state.elements;
+		newElements.push(ele.chart_instance.canvas);
+		this.setState({
+			elements: newElements,
+		});
+		console.log(this.state.elements);
+	};
+	chartClickLocation = ele => {
+		ele.onClick = e => {
+			console.log(e);
+		};
+
+		ele.chart_instance.canvas.onclick = (e, index) => {
+			let repos = '';
+			let activePoints = ele.chart_instance.getElementsAtEvent(e);
+			let firstPoint = activePoints[0];
+			if (firstPoint) {
+				this.setState({
+					currentLocationUser: this.state.LocationMatchUsers[this.state.locationIndex],
+					displayGitUserRepo: true,
+					currentTopStarUser: undefined,
+					displayIndex: firstPoint._index,
+				});
+			}
+		};
+
+		let newElements = this.state.elements;
+		newElements.push(ele.chart_instance.canvas);
+		this.setState({
+			elements: newElements,
+		});
+		console.log(this.state.elements);
+	};
+	closeRepoModal = () => {
+		this.setState({
+			currentTopStarUser: { topLanguage: undefined },
+			currentLocationUser: { topLanguage: undefined },
+		});
+	};
+	changeIndex = (index = 0) => {
+		this.setState({
+			displayIndex: index,
+		});
+	};
 	GitLocation = async event => {
 		event.preventDefault();
 
 		try {
-			this.setState({ loadingText: 'Finding Local Devs', loading: true });
+			this.setState({ loadingText: 'Validating Locations', loading: true });
 			// Check To Make Sure location is valid
 			let locationResponse = await this.getLocation(this.state.location);
 			console.info('Location Response', locationResponse);
+			this.setState({ loadingText: 'Generating Search Token', percent: 12.5 });
 			// Create the searchToken
 			let searchToken = this.createSearchToken(locationResponse, this.state.selectedLanguages);
 			console.info('Search Token', searchToken);
+			this.setState({ loadingText: 'Retrieving Local Users', percent: 25 });
 			// Retrieve Local Users
 			let locationMatchUserResponse = await this.getStarMatchUsers(searchToken);
 			console.info('Location Matched Users', locationMatchUserResponse);
+			//
+			this.setState({ loadingText: 'Retrieving Top Users', percent: 37.5 });
 			// Retrieve Top Star Users
 			let topStarNameResponse = await this.getTopStarNames(locationResponse.city, this.state.selectedLanguages[0]);
 			console.info('Top Star Name Responses', topStarNameResponse);
+			//
+			this.setState({ loadingText: 'Getting Top Users Repos', percent: 50 });
 			// Grab Top Star Users UserData and Repos
 			let topStarUsersResponse = await this.getTopStarsData(topStarNameResponse);
 			console.info('Top Star Users Response', topStarUsersResponse);
 			// Stop Loading, Set State, and Display Results
-
+			this.setState({ loadingText: 'Generating Charts', percent: 62.5 });
 			// Get Chart Data Generated for Users Charts
 			locationMatchUserResponse = this.getChartData(locationMatchUserResponse);
 			console.info('Location Matched Users Chart Data', locationMatchUserResponse);
@@ -674,12 +797,22 @@ export class LocationPageComponent extends React.Component {
 			//Generate Chars
 			this.genChart(0, 0, topStarUsersResponse[0].matchingLanguages, locationMatchUserResponse[0].matchingLanguages);
 			console.info('Chart Data', this.state.chartData);
-			this.setState({
-				TopStarUsers: topStarUsersResponse,
-				LocationMatchUsers: locationMatchUserResponse,
-				results: true,
-				loading: false,
-			});
+			this.setState({ loadingText: 'Displaying Results', percent: 100 });
+			setTimeout(() => {
+				this.setState({
+					TopStarUsers: topStarUsersResponse,
+					LocationMatchUsers: locationMatchUserResponse,
+					locationIndex: 0,
+					starIndex: 0,
+					maxStarIndex: topStarUsersResponse.length - 1,
+					maxLocationIndex: locationMatchUserResponse.length,
+					results: true,
+					loading: false,
+				});
+				setTimeout(() => {
+					console.log(this.state.elements);
+				}, 3000);
+			}, 750);
 
 			//Scroll to Results
 		} catch (err) {
@@ -697,15 +830,25 @@ export class LocationPageComponent extends React.Component {
 					select={this.select}
 				/>
 				<GitLocationResults
+					LocationMatchUser={this.state.LocationMatchUsers[this.state.locationIndex]}
+					StarMatchUser={this.state.TopStarUsers[this.state.starIndex]}
 					nextMatch={this.nextMatch}
 					previousMatch={this.previousMatch}
-					locationMaxIndex={this.state.locationMaxIndex}
-					starMaxIndex={this.state.starMaxIndex}
+					maxLocationIndex={this.state.maxLocationIndex}
+					maxStarIndex={this.state.maxStarIndex}
 					starIndex={this.state.starIndex}
 					locationIndex={this.state.locationIndex}
 					chartData={this.state.chartData}
 					results={this.state.results}
 					loading={this.state.loading}
+					bindRef={this.bindRefs}
+				/>
+				<RepoCard
+					display={this.state.displayRepoCard}
+					user={this.state.currentTopStarUser || this.state.currentLocationUser}
+					close={this.closeRepoModal}
+					index={this.state.displayIndex}
+					changeIndex={this.changeIndex}
 				/>
 				<Button onClick={this.previousUser}>Previous</Button>
 				<Button onClick={this.nextUser}>Next</Button>
