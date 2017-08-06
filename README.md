@@ -12,4 +12,6 @@ Click on the users chart to view list of repos!
 Then Click on the Repos in the Repos Modal box!
 
 # issues
-doesnt work with ios9.X due to browser incompatibilities. will be working on an ejected version to allow for this later, but have now moved on to the location portion of it.
+* doesnt work with ios9.X due to browser incompatibilities. will be working on an ejected version to allow for this later, but have now moved on to the location portion of it.
+* may have scalability issues down the road inspecting other map apis.
+
