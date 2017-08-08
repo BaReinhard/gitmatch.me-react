@@ -3,13 +3,13 @@ import http from 'axios';
 import GitLocationForm from './form';
 import GitLocationResults from './results';
 import { Modal, Grid, Button } from 'react-bootstrap';
-import { GEOCODING, ACCESS_TOKEN, COLORS } from '../../.constants';
+import { GEOCODING, ACCESS_TOKEN, COLORS, STATIC_MAP_ACCESS_TOKEN, STATIC_MAP_URL } from '../../.constants';
 import LoadingModal from '../common/loading';
 import OverlayModal from '../common/overlay';
 import RepoCard from '../common/repocard';
-import Logo from '../../img/gitmatch-logo.png';
-import subLogo from '../../img/gitmatchlogo.png';
-import background from '../../img/background.jpg';
+import Logo from '../../img/gitmatch-location-logo.png';
+import subLogo from '../../img/gitlocationlogo.png';
+import background from '../../img/background-location.jpg';
 import Scroll from 'react-scroll';
 
 // Create Default headers
@@ -78,6 +78,14 @@ export class LocationPageComponent extends React.Component {
 					local.neighborhood = this.encode(loca.short_name.toLowerCase());
 				}
 			});
+			this.setState({
+				background: `${STATIC_MAP_URL}center=${local.neighborhood
+					? local.city
+					: this.encode(
+							'los angeles',
+						)}&size=640x400&style=element:labels|visibility:off&style=element:geometry.stroke|visibility:off&style=feature:landscape|element:geometry|saturation:-100&style=feature:water|saturation:-100|invert_lightness:true&key=${STATIC_MAP_ACCESS_TOKEN}`,
+			});
+
 			return local;
 		} catch (err) {
 			throw err;
@@ -822,13 +830,18 @@ export class LocationPageComponent extends React.Component {
 
 	render() {
 		return (
-			<div>
+			<div style={{ background }}>
 				<GitLocationForm
 					submit={this.GitLocation}
 					input={this.state.location}
 					onInput={this.handleLocationInput}
 					select={this.select}
+					background={background}
+					image={Logo}
+					subImage={subLogo}
+					title={'Find Local Devs by language and location'}
 				/>
+
 				<GitLocationResults
 					LocationMatchUser={this.state.LocationMatchUsers[this.state.locationIndex]}
 					StarMatchUser={this.state.TopStarUsers[this.state.starIndex]}
@@ -842,6 +855,7 @@ export class LocationPageComponent extends React.Component {
 					results={this.state.results}
 					loading={this.state.loading}
 					bindRef={this.bindRefs}
+					background={this.state.background}
 				/>
 				<RepoCard
 					display={this.state.displayRepoCard}

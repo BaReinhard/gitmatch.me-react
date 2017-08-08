@@ -10,7 +10,7 @@ export default function GitMatchResults(props) {
 		results = <div />;
 	} else {
 		results = (
-			<Grid>
+			<Grid style={{ background: `url(${props.background})` }}>
 				<GitMatchResultCard
 					user={props.LocationMatchUser}
 					bindRef={props.bindRef}

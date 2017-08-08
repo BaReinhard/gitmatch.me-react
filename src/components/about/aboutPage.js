@@ -1,11 +1,14 @@
 import React from 'react';
 
 export class AboutPageComponent extends React.Component {
-	constructor(state, context) {
-		super(state, context);
-		this.state = {};
+	constructor(props, context) {
+		super(props, context);
 	}
 	render() {
-		return <h3>About Page</h3>;
+		return (
+			<div>
+				<h3>About Page</h3>
+			</div>
+		);
 	}
 }
