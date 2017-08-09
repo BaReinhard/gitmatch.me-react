@@ -27,6 +27,7 @@ export default class LanguagesAutoComplete extends React.Component {
 	componentDidMount() {
 		this.createLanguagesArray();
 	}
+	// Create an Array of Chooseable languages
 	createLanguagesArray = () => {
 		let languagesArray = [];
 		for (let language in COLORS) {
