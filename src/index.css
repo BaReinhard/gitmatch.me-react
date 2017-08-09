@@ -4,6 +4,16 @@ body {
 	font-family: sans-serif;
 	color: white;
 }
+#results-location,
+#results-match {
+	position: absolute;
+	background: rgba(0, 0, 0, 0.7) !important;
+	box-sizing: border-box;
+	padding: 30px;
+	margin: 0;
+	top: 100%;
+	width: 100vw;
+}
 @media (max-width: 768px) {
 	.search-bar::before {
 		content: '';

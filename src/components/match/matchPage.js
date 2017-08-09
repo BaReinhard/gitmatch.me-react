@@ -3,7 +3,7 @@ import http from 'axios';
 import GitMatchForm from './form';
 import GitMatchResults from './results';
 import { Modal, Grid } from 'react-bootstrap';
-import { GEOCODING, ACCESS_TOKEN, COLORS } from '../../.constants';
+import { GEOCODING, ACCESS_TOKEN, COLORS, STATIC_MAP_ACCESS_TOKEN, STATIC_MAP_URL } from '../../.constants';
 import LoadingModal from '../common/loading';
 import OverlayModal from '../common/overlay';
 import RepoCard from '../common/repocard';
@@ -147,6 +147,7 @@ export class MatchPageComponent extends React.Component {
 			{
 				userData: userResponse.userData,
 				repos: userResponse.repos,
+				stars: userResponse.stars,
 
 				topLanguages: languageResponse.topLanguages,
 				uniqueLang: languageResponse.uniqueLang,
@@ -638,7 +639,16 @@ export class MatchPageComponent extends React.Component {
 			`https://maps.googleapis.com/maps/api/geocode/json?address=${location}&key=${GEOCODING}`,
 		);
 		console.log(response);
-		return response.data.results[0].address_components[0].short_name.toLowerCase();
+		let loca = response.data.results[0].address_components[0].short_name.toLowerCase();
+		console.log(loca);
+		this.setState({
+			background: `${STATIC_MAP_URL}center=${this.encode(loca)
+				? this.encode(loca)
+				: this.encode(
+						'los angeles',
+					)}&size=640x640&style=element:labels|visibility:off&style=element:geometry.stroke|visibility:off&style=feature:landscape|element:geometry|saturation:-100&style=feature:water|saturation:-100|invert_lightness:true&key=${STATIC_MAP_ACCESS_TOKEN}`,
+		});
+		return loca;
 	};
 	// Handles each input on the form and sets it to state
 	input = event => {
@@ -690,6 +700,7 @@ export class MatchPageComponent extends React.Component {
 					bindRef={this.bindRefs}
 					setClass={this.setClass}
 					unsetClass={this.unsetClass}
+					background={this.state.background}
 				/>
 				<RepoCard
 					user={this.state.GitUserRepo || this.state.MatchUserRepo}

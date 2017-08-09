@@ -6,7 +6,6 @@ import Waypoint from 'react-waypoint';
 export default function GitMatchResultCard(props) {
 	// Returns for User Searching for a match
 	if (props.results && !props.nextMatch) {
-		console.log(props);
 		return (
 			<Col id="resultsScroll" xs={12} md={6}>
 				<Row>

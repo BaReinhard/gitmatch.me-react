@@ -1,6 +1,7 @@
 import React from 'react';
 import GitMatchResultCard from './resultcard';
 import { Col, Grid } from 'react-bootstrap';
+import PseudoAfter from '../common/pseudoAfter';
 
 export default function GitMatchResults(props) {
 	let results;
@@ -8,31 +9,31 @@ export default function GitMatchResults(props) {
 		results = <div />;
 	} else {
 		results = (
-			<Grid>
-				<Col md={12} style={{ color: 'black' }}>
-					<GitMatchResultCard
-						key={null}
-						user={props.GitMatchUser}
-						chartData={props.chartData.GitMatchUser}
-						results={props.results}
-						bindRef={props.bindRef}
-						setClass={props.setClass}
-						unsetClass={props.unsetClass}
-					/>
+			<div id="results-match">
+				<GitMatchResultCard
+					key={null}
+					user={props.GitMatchUser}
+					chartData={props.chartData.GitMatchUser}
+					getMyStars={props.getMyStars}
+					results={props.results}
+					bindRef={props.bindRef}
+					setClass={props.setClass}
+					unsetClass={props.unsetClass}
+				/>
 
-					<GitMatchResultCard
-						index={props.index}
-						getMyStars={props.getMyStars}
-						maxIndex={props.maxIndex}
-						nextMatch={props.nextMatch}
-						previousMatch={props.previousMatch}
-						user={props.MatchingUsers[props.index]}
-						chartData={props.chartData.MatchedUser}
-						results={props.results}
-						bindRef={props.bindRef}
-					/>
-				</Col>
-			</Grid>
+				<GitMatchResultCard
+					index={props.index}
+					getMyStars={props.getMyStars}
+					maxIndex={props.maxIndex}
+					nextMatch={props.nextMatch}
+					previousMatch={props.previousMatch}
+					user={props.MatchingUsers[props.index]}
+					chartData={props.chartData.MatchedUser}
+					results={props.results}
+					bindRef={props.bindRef}
+				/>
+				<PseudoAfter background={props.background} />
+			</div>
 		);
 	}
 	return results;

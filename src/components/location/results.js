@@ -1,6 +1,7 @@
 import React from 'react';
 import GitMatchResultCard from './resultcard';
 import Chart from '../common/chart';
+import PseudoAfter from '../common/pseudoAfter';
 import { Col, Grid } from 'react-bootstrap';
 
 export default function GitMatchResults(props) {
@@ -10,8 +11,9 @@ export default function GitMatchResults(props) {
 		results = <div />;
 	} else {
 		results = (
-			<Grid style={{ background: `url(${props.background})` }}>
+			<div id="results-location">
 				<GitMatchResultCard
+					id="results-location-card"
 					user={props.LocationMatchUser}
 					bindRef={props.bindRef}
 					chartData={props.chartData.LocationMatchUser}
@@ -21,6 +23,7 @@ export default function GitMatchResults(props) {
 					maxIndex={props.maxLocationIndex}
 				/>
 				<GitMatchResultCard
+					id="results-location-card"
 					user={props.StarMatchUser}
 					bindRef={props.bindRef}
 					chartData={props.chartData.StarMatchUser}
@@ -29,7 +32,8 @@ export default function GitMatchResults(props) {
 					index={props.starIndex}
 					maxIndex={props.maxStarIndex}
 				/>
-			</Grid>
+				<PseudoAfter background={props.background} />
+			</div>
 		);
 	}
 	return results;

@@ -83,7 +83,7 @@ export class LocationPageComponent extends React.Component {
 					? local.city
 					: this.encode(
 							'los angeles',
-						)}&size=640x400&style=element:labels|visibility:off&style=element:geometry.stroke|visibility:off&style=feature:landscape|element:geometry|saturation:-100&style=feature:water|saturation:-100|invert_lightness:true&key=${STATIC_MAP_ACCESS_TOKEN}`,
+						)}&size=640x640&style=element:labels|visibility:off&style=element:geometry.stroke|visibility:off&style=feature:landscape|element:geometry|saturation:-100&style=feature:water|saturation:-100|invert_lightness:true&key=${STATIC_MAP_ACCESS_TOKEN}`,
 			});
 
 			return local;
@@ -149,7 +149,7 @@ export class LocationPageComponent extends React.Component {
 			});
 			if (index < 5 && stars === undefined) {
 				starsResponse = await http
-					.get(`https://crossorasdigin.me/http://git-awards.com/api/v0/users/${username}`)
+					.get(`https://crossorigin.me/http://git-awards.com/api/v0/users/${username}`)
 					.then(response => {
 						let stars = 0;
 						response.data.user.rankings.forEach(rank => {
@@ -220,10 +220,10 @@ export class LocationPageComponent extends React.Component {
 			if (location !== undefined) {
 				console.info('Getting Top Star Users');
 				let locationTopStarUsers = await http(
-					`https://crossorasdsigin.me/http://git-awards.com/api/v0/users?city=${location}&language=${topLanguage}`,
+					`https://crossorigin.me/http://git-awards.com/api/v0/users?city=${location}&language=${topLanguage}`,
 				);
 				console.info('Top Star Users', locationTopStarUsers);
-				return locationTopStarUsers.users;
+				return locationTopStarUsers.data.users;
 			} else {
 				return [];
 				throw new Error('Could not find a city');
@@ -830,7 +830,7 @@ export class LocationPageComponent extends React.Component {
 
 	render() {
 		return (
-			<div style={{ background }}>
+			<div style={{ height: '100%', width: '100%' }}>
 				<GitLocationForm
 					submit={this.GitLocation}
 					input={this.state.location}
@@ -864,8 +864,6 @@ export class LocationPageComponent extends React.Component {
 					index={this.state.displayIndex}
 					changeIndex={this.changeIndex}
 				/>
-				<Button onClick={this.previousUser}>Previous</Button>
-				<Button onClick={this.nextUser}>Next</Button>
 				<LoadingModal loading={this.state.loading} text={this.state.loadingText} percent={this.state.percent} />
 				<OverlayModal loading={this.state.loading} />
 			</div>
