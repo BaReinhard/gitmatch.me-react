@@ -17,36 +17,38 @@ const headers = {
 	Authorization: `token ${ACCESS_TOKEN}`,
 };
 // Create default state to use in constructor and clearState()
-const defaultState = {
-	defaultShownLanguages: ['JavaScript', 'Python', 'C'],
-	location: '',
-	displayRepoCard: false,
-	selectedLanguages: ['JavaScript', 'Python', 'C'],
-	topLocationUsers: [],
-	topMatchUsers: [],
-	elements: [],
-	displayIndex: 0,
-	starIndex: 0,
-	locationIndex: 0,
-	LocationMatchUsers: [],
-	TopStarUsers: [],
-	currentTopStarUser: { matchingLanguages: undefined },
-	currentLocationUser: { matchingLanguages: undefined },
-	chartData: {
-		LocationMatchUser: { data: undefined },
-		StarMatchUser: { data: undefined },
-	},
-	chartRefs: [],
-	percent: 0,
-	results: false,
-};
-export class LocationPageComponent extends React.Component {
-	constructor(props, context) {
-		super(props, context);
+let defaultState = {};
+export default class LocationPageComponent extends React.Component {
+	constructor(props) {
+		super(props);
+		defaultState = {
+			defaultShownLanguages: props.defaultLanguages || ['JavaScript', 'Python', 'C'],
+			location: '',
+			displayRepoCard: false,
+			selectedLanguages: ['JavaScript', 'Python', 'C'],
+			topLocationUsers: [],
+			topMatchUsers: [],
+			elements: [],
+			displayIndex: 0,
+			starIndex: 0,
+			locationIndex: 0,
+			LocationMatchUsers: [],
+			TopStarUsers: [],
+			currentTopStarUser: { matchingLanguages: undefined },
+			currentLocationUser: { matchingLanguages: undefined },
+			chartData: {
+				LocationMatchUser: { data: undefined },
+				StarMatchUser: { data: undefined },
+			},
+			chartRefs: [],
+			percent: 0,
+			results: false,
+		};
 		this.state = defaultState;
 	}
 	errorHandler = error => {
 		console.error(error);
+		return error;
 	};
 	encode = str => {
 		return encodeURIComponent(str);
@@ -112,10 +114,8 @@ export class LocationPageComponent extends React.Component {
 	// create the search token for the github api
 	createSearchToken = (
 		location = { city: 'los%20angeles', neighborhood: undefined },
-		selectedLanguages = this.state.defaultShownLanguages,
+		selectedLanguages = this.state.defaultShownLanguages || '',
 	) => {
-		console.log('Location in search Token', location);
-		console.info('Selected Languages', selectedLanguages);
 		let LocationParam = '';
 		if (location.neighborhood !== undefined) {
 			LocationParam = location.neighborhood;
@@ -125,7 +125,7 @@ export class LocationPageComponent extends React.Component {
 			LocationParam = 'los%20angeles';
 		}
 		let token = `location:${LocationParam}`;
-		selectedLanguages.forEach(lang => (token += `+language:${lang}`));
+		selectedLanguages.forEach(lang => (token += `+language:${this.encode(lang)}`));
 		return token;
 	};
 	getUserRepoData = async (username, index = 0, stars = undefined) => {

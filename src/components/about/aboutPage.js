@@ -1,5 +1,6 @@
 import React from 'react';
-import AutoComplete from '../common/autocomplete';
+import { COLORS } from '../../.constants';
+import AutoComplete from 'autocomplete-react-component';
 
 export class AboutPageComponent extends React.Component {
 	constructor(props, context) {
@@ -9,15 +10,25 @@ export class AboutPageComponent extends React.Component {
 			closeLanguages: false,
 		};
 	}
-	selectedLanguageHandler = event => {
-		if (this.state.selectedLanguages.includes(event.target.innerText)) {
+	componentWillMount() {
+		let languagesArray = [];
+		for (let language in COLORS) {
+			languagesArray.push(language);
+		}
+		console.log(languagesArray);
+		this.setState({
+			languagesArray: languagesArray,
+		});
+	}
+	selectedLanguageHandler = val => {
+		if (this.state.selectedLanguages.includes(val)) {
 			let newLanguages = this.state.selectedLanguages.filter(language => {
-				return language !== event.target.innerText;
+				return language !== val;
 			});
 			this.setState({ selectedLanguages: newLanguages });
 		} else {
 			this.setState({
-				selectedLanguages: [...this.state.selectedLanguages, event.target.innerText],
+				selectedLanguages: [...this.state.selectedLanguages, val],
 			});
 		}
 	};
@@ -27,8 +38,11 @@ export class AboutPageComponent extends React.Component {
 			<div style={{ color: 'black' }} onClick={this.closeDisplay}>
 				<h3>About Page</h3>
 				<AutoComplete
-					selectedLanguageHandler={this.selectedLanguageHandler}
-					selectedLanguages={this.state.selectedLanguages}
+					style={{ color: 'grey' }}
+					dropdownStyle={{ backgroundColor: 'yellow' }}
+					valuesStyle={{ color: 'pink' }}
+					values={this.state.languagesArray}
+					onClick={this.selectedLanguageHandler}
 				/>
 				<h4>Selected Languages</h4>
 				{this.state.selectedLanguages.map(language => {

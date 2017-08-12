@@ -4,6 +4,11 @@ body {
 	font-family: sans-serif;
 	color: white;
 }
+li.valuedisplay-item:hover {
+	background: #333 !important;
+	cursor: pointer;
+}
+
 #results-location,
 #results-match {
 	position: absolute;

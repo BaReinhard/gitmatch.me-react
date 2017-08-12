@@ -13,10 +13,10 @@ import background from '../../img/background.jpg';
 
 import Scroll from 'react-scroll';
 const headers = {
-	Authorization: `token ${ACCESS_TOKEN}`,
+	Authorization: 'token ac35c1fc8c52c1e4e101544fac92255f00735f2f',
 };
 let defaultState = {};
-export class MatchPageComponent extends React.Component {
+export default class MatchPageComponent extends React.Component {
 	constructor(state, context) {
 		super(state, context);
 		this.state = defaultState = {
@@ -604,7 +604,7 @@ export class MatchPageComponent extends React.Component {
 		let reposResponse = await http.get(`https://api.github.com/users/${username}/repos?page=1&per_page=100`, {
 			headers: headers,
 		});
-		// This needs rework as it doesn't get the top 5 stars, but the top 5 users from the initial git request
+		//This needs rework as it doesn't get the top 5 stars, but the top 5 users from the initial git request
 		if (index < 0) {
 			starsResponse = await http
 				.get(`https://crossorigin.me/http://git-awards.com/api/v0/users/${username}`)

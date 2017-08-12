@@ -1,20 +1,10 @@
 import React from 'react';
-import { MatchPageComponent } from './components/match/matchPage';
-import { LocationPageComponent } from './components/location/locationPage';
+import MatchPageComponent from './components/match/matchPage';
+import LocationPageComponent from './components/location/locationPage';
 import { AboutPageComponent } from './components/about/aboutPage';
-import {
-	LinkContainer,
-	IndexLinkContainer,
-} from 'react-router-bootstrap';
+import { LinkContainer, IndexLinkContainer } from 'react-router-bootstrap';
 import NavLogo from './img/gitmatch-nav-logo.png';
-import {
-	Navbar,
-	Nav,
-	Image,
-	NavItem,
-	MenuItem,
-	NavDropdown,
-} from 'react-bootstrap';
+import { Navbar, Nav, Image, NavItem, MenuItem, NavDropdown } from 'react-bootstrap';
 
 import { BrowserRouter, Route, NavLink } from 'react-router-dom';
 function App() {
@@ -56,11 +46,7 @@ function App() {
 					</Navbar.Collapse>
 				</Navbar>
 				<Route exact path={'/'} component={MatchPageComponent} />
-				<Route
-					exact
-					path="/location"
-					component={LocationPageComponent}
-				/>
+				<Route exact path="/location" component={LocationPageComponent} />
 				<Route exact path="/about" component={AboutPageComponent} />
 			</div>
 		</BrowserRouter>
