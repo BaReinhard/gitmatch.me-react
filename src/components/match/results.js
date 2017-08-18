@@ -7,6 +7,7 @@ export default function GitMatchResults(props) {
     if (!props.results & !props.loading) {
         results = <div />;
     } else {
+        debugger;
         results = (
             <div id="results-match">
                 <GitMatchResultCard

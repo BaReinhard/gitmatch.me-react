@@ -86,6 +86,8 @@ export default function GitLocationForm(props) {
                 languages={props.languages}
                 onClick={props.onLanguageSelect}
                 display={props.showLanguagesModal}
+                modalHandler={props.displayLanguagesModal}
+                selectedLanguages={props.selectedLanguages}
             />
         </Col>
     );

@@ -1,45 +1,47 @@
 body {
-	margin: 0;
-	padding: 0;
-	font-family: sans-serif;
-	color: white;
+    margin: 0;
+    padding: 0;
+    font-family: sans-serif;
+    color: white;
 }
 li.valuedisplay-item:hover {
-	background: #333 !important;
-	cursor: pointer;
+    background: #333 !important;
+    cursor: pointer;
 }
-
+input {
+    border: 2px black solid;
+}
 #results-location,
 #results-match {
-	position: absolute;
-	background: rgba(0, 0, 0, 0.7) !important;
-	box-sizing: border-box;
-	padding: 30px;
-	margin: 0;
-	top: 100%;
-	width: 100vw;
+    position: absolute;
+    background: rgba(0, 0, 0, 0.7) !important;
+    box-sizing: border-box;
+    padding: 30px;
+    margin: 0;
+    top: 100%;
+    width: 100vw;
 }
 @media (max-width: 768px) {
-	.search-bar::before {
-		content: '';
-	}
-	.search-bar {
-		position: fixed;
-		width: 100%;
-		top: 50px;
-		left: 0;
-		right: 0;
-		z-index: 1000;
-		padding: 10px 60px 10px 60px;
-		background-color: rgb(0, 0, 0);
-	}
+    .search-bar::before {
+        content: '';
+    }
+    .search-bar {
+        position: fixed;
+        width: 100%;
+        top: 50px;
+        left: 0;
+        right: 0;
+        z-index: 1000;
+        padding: 10px 60px 10px 60px;
+        background-color: rgb(0, 0, 0);
+    }
 }
 @media (min-width: 768px) {
-	.search-bar {
-		position: fixed;
-		width: 40%;
-		top: 1%;
-		left: 30%;
-		z-index: 1000;
-	}
+    .search-bar {
+        position: fixed;
+        width: 40%;
+        top: 1%;
+        left: 30%;
+        z-index: 1000;
+    }
 }

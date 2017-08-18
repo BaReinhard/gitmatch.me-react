@@ -4,12 +4,14 @@ import GitLocationForm from './form';
 import GitLocationResults from './results';
 import { GEOCODING, ACCESS_TOKEN, COLORS, STATIC_MAP_ACCESS_TOKEN, STATIC_MAP_URL } from '../../.constants';
 import LoadingModal from '../common/loading';
+import ErrorModal from '../common/error';
 import OverlayModal from '../common/overlay';
 import RepoCard from '../common/repocard';
 import Logo from '../../img/gitmatch-location-logo.png';
 import subLogo from '../../img/gitlocationlogo.png';
 import background from '../../img/background-location.jpg';
 import Scroll from 'react-scroll';
+import { Modal } from 'react-bootstrap';
 
 // Create Default headers
 const headers = {
@@ -38,6 +40,8 @@ export default class LocationPageComponent extends React.Component {
             displayIndex: 0,
             starIndex: 0,
             locationIndex: 0,
+            hasError: false,
+            errorMessage: '',
             LocationMatchUsers: [],
             TopStarUsers: [],
             currentTopStarUser: { matchingLanguages: undefined },
@@ -54,7 +58,11 @@ export default class LocationPageComponent extends React.Component {
     }
     errorHandler = error => {
         console.error(error);
-        return error;
+        this.setState({
+            loading: false,
+            hasError: true,
+            errorMessage: error.message,
+        });
     };
     encode = str => {
         return encodeURIComponent(str);
@@ -105,11 +113,19 @@ export default class LocationPageComponent extends React.Component {
     // Prevent Language Submission from refreshing page, and sets state to update selected languages
     // then clear language input
     handleLanguageClick = lang => {
-        this.setState((prevState, props) => ({
-            // Spread operator to merge arrays in an immutable way
-            selectedLanguages: [...prevState.selectedLanguages, lang],
-            language: '',
-        }));
+        if (!this.state.selectedLanguages.includes(lang)) {
+            this.setState((prevState, props) => ({
+                // Spread operator to merge arrays in an immutable way
+                selectedLanguages: [...prevState.selectedLanguages, lang],
+                language: '',
+            }));
+        } else {
+            this.setState((prevState, props) => ({
+                // Spread operator to merge arrays in an immutable way
+                selectedLanguages: [...prevState.selectedLanguages.filter(lan => lan !== lang)],
+                language: '',
+            }));
+        }
     };
     // Handles Language Input Box, and updates state
     handleLanguageInput = event => {
@@ -135,7 +151,7 @@ export default class LocationPageComponent extends React.Component {
     getUserRepoData = async (username, index = 0, stars = undefined) => {
         // Get UserData, and wait for it to return before getting repos
         try {
-            let starsResponse = false;
+            let starsResponse = 0;
             let userResponse = await http
                 .get(`https://api.github.com/users/${username}`, {
                     headers: headers,
@@ -151,22 +167,10 @@ export default class LocationPageComponent extends React.Component {
             let reposResponse = await http.get(`https://api.github.com/users/${username}/repos?page=1&per_page=100`, {
                 headers: headers,
             });
-            if (index < 5 && stars === undefined) {
-                starsResponse = await http
-                    .get(`https://crossorigin.me/http://git-awards.com/api/v0/users/${username}`)
-                    .then(response => {
-                        let stars = 0;
-                        response.data.user.rankings.forEach(rank => {
-                            stars += rank.stars_count;
-                        });
-                        return stars;
-                    })
-                    .catch(err => {
-                        return false;
-                    });
-            } else if (stars !== undefined) {
-                starsResponse = stars;
-            }
+            reposResponse.data.forEach(repo => {
+                starsResponse += repo.stargazers_count;
+            });
+
             let matchingLanguages = [];
             if (reposResponse.data.length) {
                 let uniqueLang = {};
@@ -194,7 +198,9 @@ export default class LocationPageComponent extends React.Component {
     };
     getStarMatchUsers = async (searchToken = '') => {
         try {
-            let usersResponse = await http.get(`https://api.github.com/search/users?q=${searchToken}`);
+            let usersResponse = await http.get(
+                `https://api.github.com/search/users?q=${searchToken}&page=1&per_page=100`,
+            );
             console.info('Users Response inside get Star', usersResponse);
             // Get UserData and Repos, starts the promises concurrently, and stores them synchronously
             let promises = usersResponse.data.items.map((user, index) => {
@@ -224,10 +230,13 @@ export default class LocationPageComponent extends React.Component {
             if (location !== undefined) {
                 console.info('Getting Top Star Users');
                 let locationTopStarUsers = await http(
-                    `https://crossorigin.me/http://git-awards.com/api/v0/users?city=${location}&language=${topLanguage}`,
+                    `https://api.github.com/search/users?q=location:${location}&language:${topLanguage}`,
+                    {
+                        headers: headers,
+                    },
                 );
                 console.info('Top Star Users', locationTopStarUsers);
-                return locationTopStarUsers.data.users;
+                return locationTopStarUsers.data.items;
             } else {
                 throw new Error('Could not find a city');
             }
@@ -515,12 +524,17 @@ export default class LocationPageComponent extends React.Component {
             //     total_count: 2358,
             // };
             // return users.users;
-            throw err;
+            throw new Error('Could not get Top Star Users');
         }
     };
     getTopStarsData = async (users, index = 1000) => {
+        console.error(users);
         let topStarsUsers = [];
-        let promises = users.map(user => this.getUserRepoData(user.login, index, user.stars_count));
+        let promises = users.map(user =>
+            http.get(`https://api.github.com/users/${user.login}/repos?page=1&per_page=100`, {
+                headers: headers,
+            }),
+        );
         for (let promise of promises) {
             let resolvedCorrectly = await promise;
             if (!resolvedCorrectly) {
@@ -528,9 +542,45 @@ export default class LocationPageComponent extends React.Component {
                 topStarsUsers.push(await promise);
             }
         }
+        console.log(topStarsUsers);
+        topStarsUsers = topStarsUsers.map((reposResponse, userIndex) => {
+            let starsResponse = 0;
+            reposResponse.data.forEach(repo => {
+                starsResponse += repo.stargazers_count;
+            });
+
+            let matchingLanguages = [];
+            if (reposResponse.data.length) {
+                let uniqueLang = {};
+                reposResponse.data.forEach((repo, index) => {
+                    if (repo.language !== undefined) {
+                        if (uniqueLang[repo.language] === undefined && repo.language !== null) {
+                            uniqueLang[repo.language] = matchingLanguages.length;
+                            matchingLanguages.push({ language: repo.language, count: 1, reposDetails: [repo] });
+                        } else if (repo.language !== null && repo.language !== undefined) {
+                            console.log(repo);
+                            console.log(uniqueLang, repo.language, matchingLanguages);
+                            matchingLanguages[uniqueLang[repo.language]].count++;
+                            matchingLanguages[uniqueLang[repo.language]].reposDetails.push(repo);
+                        }
+                    }
+                });
+            } else {
+                matchingLanguages = [];
+            }
+            return {
+                userData: users[userIndex],
+                repos: reposResponse.data,
+                stars: starsResponse,
+                matchingLanguages: matchingLanguages,
+            };
+        });
+
+        console.warn(topStarsUsers);
         return topStarsUsers;
     };
     getChartData = usersData => {
+        console.log(usersData);
         usersData.forEach(data => {
             // console.log('UserData Data', data);
             // let reposHolder = {};
@@ -801,6 +851,8 @@ export default class LocationPageComponent extends React.Component {
             // Get Chart Data Generated for Users Charts
             locationMatchUserResponse = this.getChartData(locationMatchUserResponse);
             console.info('Location Matched Users Chart Data', locationMatchUserResponse);
+            debugger;
+
             topStarUsersResponse = this.getChartData(topStarUsersResponse);
             console.info('Top Star Users Chart Data', topStarUsersResponse);
 
@@ -873,6 +925,7 @@ export default class LocationPageComponent extends React.Component {
                     background={background}
                     image={Logo}
                     subImage={subLogo}
+                    selectedLanguages={this.state.selectedLanguages}
                     languages={this.state.languages}
                     title={'Find Local Devs by language and location'}
                     displayLanguagesModal={this.displayLanguagesModal}
@@ -903,6 +956,9 @@ export default class LocationPageComponent extends React.Component {
                     index={this.state.displayIndex}
                     changeIndex={this.changeIndex}
                 />
+                <ErrorModal error={this.state.hasError} text={this.state.errorMessage} />
+                <OverlayModal loading={this.state.hasError} />
+
                 <LoadingModal loading={this.state.loading} text={this.state.loadingText} percent={this.state.percent} />
                 <OverlayModal loading={this.state.loading} />
             </div>

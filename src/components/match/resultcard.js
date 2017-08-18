@@ -141,7 +141,7 @@ export default function GitMatchResultCard(props) {
                 </div>
 
                 <GitMatchChart
-                    refName={'MatchedUser'}
+                    refName={'MatchUser'}
                     bindRef={props.bindRef}
                     chartData={props.chartData.data}
                     chartOptions={props.chartData.options}
